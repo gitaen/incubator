@@ -6,6 +6,7 @@
 
 void StatusScreen::init(LiquidCrystal *lcd, Sensor *temperatureSensor, 
 			   Sensor *humiditySensor, TimerTrigger *timerTrigger) {
+  _lcd = lcd;
   _temperatureSensor = temperatureSensor;
   _humiditySensor = humiditySensor;
   _timerTrigger = timerTrigger;
@@ -30,28 +31,28 @@ void StatusScreen::update (Subject *subject) {
     } else if (subject == _timerTrigger) {
       _lcd->setCursor(0,1);
       if (_timerTrigger->isActive()){
-	if (_timerTrigger->getOnState()) {
-	  _lcd->print("Eggs turning    ");
-	} else {
-	  _lcd->print("Next:           ");
-	  _lcd->setCursor(8,1);
-	  timeLeft = _timerTrigger->getTimeLeft();
-	  itoa(timeLeft/3600, str, 10);
-	  _lcd->print(str);
-	  _lcd->print(':');
-	  itoa((timeLeft%3600)/60, str, 10);
-	  if (strlen(str) < 2)
-	    _lcd->print("0");
-	  _lcd->print(str);
-	  _lcd->print(':');
-	  itoa(timeLeft%60, str, 10);
-	  if (strlen(str) < 2)
-	    _lcd->print("0");
-	  _lcd->print(str);
-	}
+  	if (_timerTrigger->getOnState()) {
+  	  _lcd->print("Eggs turning    ");
+  	} else {
+  	  _lcd->print("Next:           ");
+  	  _lcd->setCursor(8,1);
+  	  timeLeft = _timerTrigger->getTimeLeft();
+  	  itoa(timeLeft/3600, str, 10);
+  	  _lcd->print(str);
+  	  _lcd->print(':');
+  	  itoa((timeLeft%3600)/60, str, 10);
+  	  if (strlen(str) < 2)
+  	    _lcd->print("0");
+  	  _lcd->print(str);
+  	  _lcd->print(':');
+  	  itoa(timeLeft%60, str, 10);
+  	  if (strlen(str) < 2)
+  	    _lcd->print("0");
+  	  _lcd->print(str);
+  	}
       }
       else {
-	_lcd->print("Turner off");
+  	_lcd->print("Turner off");
       }
     }
   }

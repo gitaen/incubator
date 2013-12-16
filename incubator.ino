@@ -55,7 +55,7 @@ uint8_t rules[NUMBEROFFUZZYSETS][NUMBEROFFUZZYSETS] =
   {{P, P, Z_E},  // error = N
    {P, Z_E, N},  // error = Z_E
    {Z_E, N, N}};  // error = P
-float outputFunction[NUMBEROFFUZZYSETS] = {-5, 0, 5};
+float outputFunction[NUMBEROFFUZZYSETS] = {-2, 0, 2};
 
 Controller humidityController;
 Controller temperatureController;
@@ -75,6 +75,7 @@ Screen *screen[NUMBEROFSCREENS] = {&statusScreen,
 				   &humidityScreen,
 				   &timerScreen};
 
+// Screen *screen[NUMBEROFSCREENS] = {&statusScreen};
 
 void setup (void){
   Serial.begin(9600);
@@ -110,8 +111,9 @@ void setup (void){
   		  &eggTurnerTimer);
   eggTurnerTimer.restore(TURNERADDR);
 
+  lcd.begin(16,2);
   statusScreen.init(&lcd, &temperatureSensor,
-  		    &humiditySensor, &eggTurnerTimer);
+   		    &humiditySensor, &eggTurnerTimer);
   statusScreen.activate(true);
   temperatureScreen.init(&lcd, "temp", &temperatureController);
   temperatureScreen.activate(false);
@@ -164,30 +166,30 @@ void loop (void) {
 
   while (true) {
     delay(200);
-    // if ((millis() - lastPush) > 5000){
-    //   if (activeScreen != 0) {
-    // 	screen[activeScreen]->activate(false);
-    // 	activeScreen = 0;
-    // 	screen[activeScreen]->activate(true);
-    //   }
-    // }
+    if ((millis() - lastPush) > 5000){
+      if (activeScreen != 0) {
+    	screen[activeScreen]->activate(false);
+    	activeScreen = 0;
+    	screen[activeScreen]->activate(true);
+      }
+    }
 
-    // if (!digitalRead(SELECTBUTTON)){
-    //   lastPush = millis();
-    //   screen[activeScreen]->activate(false);
-    //   activeScreen = (activeScreen + 1) % NUMBEROFSCREENS;
-    //   screen[activeScreen]->activate(true);
-    // }
+    if (!digitalRead(SELECTBUTTON)){
+      lastPush = millis();
+      screen[activeScreen]->activate(false);
+      activeScreen = (activeScreen + 1) % NUMBEROFSCREENS;
+      screen[activeScreen]->activate(true);
+    }
 
-    // if (!digitalRead(INCREASEBUTTON)){
-    //   lastPush = millis();
-    //   screen[activeScreen]->modify(step);
-    // }
+    if (!digitalRead(INCREASEBUTTON)){
+      lastPush = millis();
+      screen[activeScreen]->modify(step);
+    }
 
-    // if (!digitalRead(DECREASEBUTTON)){
-    //   lastPush = millis();
-    //   screen[activeScreen]->modify(-1 * step);
-    // }
+    if (!digitalRead(DECREASEBUTTON)){
+      lastPush = millis();
+      screen[activeScreen]->modify(-1 * step);
+    }
 
     if (!(tick_counter % 5)) {
       eggTurnerTimer.check();
