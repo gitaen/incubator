@@ -1,8 +1,5 @@
-extern "C" {
-#include <avr/eeprom.h>
-}
 #include <Arduino.h>
-
+#include <EEPROM.h>
 #include "Controller.h"
 extern "C" {
 #include "floatToString.h"
@@ -91,22 +88,26 @@ void Controller::control (void) {
 
 
 void Controller::save(int address) {
-  if (modified){
-    noInterrupts();
-    eeprom_busy_wait();
-    eeprom_write_block((unsigned char *) address, (void *) &target, 4);
-    interrupts();
+  int i;
+  byte *b = (byte *)&target;
+
+  if (modified) {
+    for (i=0; i<sizeof(float); i++) {
+      EEPROM.write(address+i, *b++);
+    }
   }
   
   modified = false;
 }
 
 void Controller::restore(int address) {
-  noInterrupts();
-  eeprom_busy_wait();
-  eeprom_read_block((void *) &target, (unsigned char *) address, 4);
-  interrupts();
+  int i;
+  byte *b = (byte *)&target;
 
+  for (i=0; i<sizeof(float); i++) {
+    *b++ = EEPROM.read(address+i);
+  }
+  
   modified = false;
   notify();
 }

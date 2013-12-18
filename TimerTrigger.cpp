@@ -1,7 +1,5 @@
-extern "C" {
-#include <avr/eeprom.h>
-}
 #include <Arduino.h>
+#include <EEPROM.h>
 #include "TimerTrigger.h"
 
 void TimerTrigger::init (uint8_t pinNumber) {
@@ -51,21 +49,14 @@ void TimerTrigger::activate (bool on) {
 
 void TimerTrigger::save(int address) {
   if (modified){
-    noInterrupts();
-    eeprom_busy_wait();
-    eeprom_write_block((unsigned char *) address, (void *) &active, 1);
-    interrupts();
+    EEPROM.write(address, active);
   }
   
   modified = false;
 }
 
 void TimerTrigger::restore(int address) {
-  noInterrupts();
-  eeprom_busy_wait();
-  eeprom_read_block((void *) &active, (unsigned char *) address, 1);
-  interrupts();
-
+  active = EEPROM.read(address);
   modified = false;
   notify();
 }

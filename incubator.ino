@@ -134,9 +134,6 @@ void setup (void){
   humidityScreen.activate(false);
   timerScreen.init(&lcd, "Turner", &eggTurnerTimer);
   timerScreen.activate(false);
-
-  temperatureController.setTarget(37.7);
-  humidityController.setTarget(55);
 }
 
 void loop (void) {
