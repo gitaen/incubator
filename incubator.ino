@@ -33,9 +33,6 @@
 #define HUMIDADDR 4
 #define TURNERADDR 8
 
-#define INIT_TIMER_COUNT 6
-#define RESET_TIMER1 TCNT1 = INIT_TIMER_COUNT
-
 uint8_t tick_counter = 0;
 
 LiquidCrystal lcd = LiquidCrystal(RSPIN, ENABLEPIN, D4PIN, D5PIN, D6PIN, D7PIN); 
@@ -93,8 +90,6 @@ Screen *screen[NUMBEROFSCREENS] = {&statusScreen,
 				   &humidityScreen,
 				   &timerScreen};
 
-// Screen *screen[NUMBEROFSCREENS] = {&statusScreen};
-
 void setup (void){
   Serial.begin(9600);
   pinMode(SELECTBUTTON, INPUT);
@@ -145,21 +140,24 @@ void setup (void){
 }
 
 void loop (void) {
-  unsigned long lastPush = millis();
-  unsigned long lastExecution = millis();
+  unsigned long int lastPush = millis();
   uint8_t activeScreen = 0;
   float step = 0.1;
   float temperature;
   float humidity;
-  float dewPoint;
+  bool measActive = false;
+  uint8_t measType = TEMP;
+  bool measReady = false;
+  unsigned int rawData;
+  unsigned long int now;
 
   Serial.println("Init");
 
   analogWrite(FANPIN, 255);
 
   while (true) {
-    delay(200);
-    if ((millis() - lastPush) > 5000){
+    now = millis();
+    if ((now - lastPush) > 5000){
       if (activeScreen != 0) {
     	screen[activeScreen]->activate(false);
     	activeScreen = 0;
@@ -188,13 +186,31 @@ void loop (void) {
       eggTurnerTimer.check();
     }
 
-    if (!(tick_counter % 25)) {
-      shtxx.measure(&temperature, &humidity, &dewPoint);
+    if (!(tick_counter % 25) && !measActive) {
+      measActive = true;
+      measType = TEMP;
+      shtxx.meas(measType, &rawData, NONBLOCK);
+    } 
+
+    if (measActive && shtxx.measRdy()) {
+      if (measType == TEMP) {
+	temperature = shtxx.calcTemp(rawData);
+	measType = HUMI;
+	shtxx.meas(measType, &rawData, NONBLOCK);
+      } else {
+	humidity = shtxx.calcHumi(rawData, temperature);
+	measActive = false;
+	measReady = true;
+      }
+    }
+
+    if (measReady) {
+      measReady = false;
       temperatureSensor.update(temperature);
       humiditySensor.update(humidity);
       temperatureController.control();
       humidityController.control();
-    } 
+    }
     
     if (!(tick_counter % 50)){
       temperatureController.save(TEMPADDR);
@@ -203,6 +219,7 @@ void loop (void) {
     }
     
     tick_counter++;
+    delay(200-(millis()-now));
   }
 
 }
