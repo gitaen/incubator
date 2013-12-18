@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "StatusScreen.h"
-#include "floatToString.h"
 #include <HardwareSerial.h>
 
 void StatusScreen::init(LiquidCrystal *lcd, Sensor *temperatureSensor, 
@@ -83,7 +82,7 @@ void StatusScreen::updateSensor(Sensor *sensor, uint8_t col, uint8_t row) {
 
   measureUnits = sensor->getMeasureUnits();
   tempFloat = sensor->getMeasurement();
-  floatToString(str, tempFloat, 1, 4, true);
+  dtostrf(tempFloat, 4, 1, str);
   _lcd->setCursor(col,row);
   _lcd->print(str);
   _lcd->print(measureUnits);

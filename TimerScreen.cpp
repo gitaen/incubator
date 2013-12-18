@@ -1,8 +1,6 @@
 #include <stdlib.h>
 #include "TimerScreen.h"
-#include "floatToString.h"
 #include "MemoryTest.h"
-//#include <HardwareSerial.h>
 
 void TimerScreen::init(LiquidCrystal *lcd, char *nameString, 
 			    TimerTrigger *timer) {

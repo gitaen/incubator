@@ -1,6 +1,5 @@
 //#include <stdlib.h>
 #include "ControllerScreen.h"
-#include "floatToString.h"
 #include "MemoryTest.h"
 
 void ControllerScreen::init(LiquidCrystal *lcd, char *nameString, 
@@ -24,7 +23,7 @@ void ControllerScreen::update (Subject *subject) {
 //  Serial.println("Update");
   if (activated) {
     _lcd->setCursor(0,1);
-    floatToString(str, _controller->getTarget(), 1, 5, true);
+    dtostrf(_controller->getTarget(), -5, 1, str);
     _lcd->print(str);
     _lcd->print(_controller->getSensor()->getMeasureUnits());
   }

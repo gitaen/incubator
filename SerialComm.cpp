@@ -3,7 +3,6 @@
 #include <HardwareSerial.h>
 #include <string.h>
 #include "SerialComm.h"
-#include "floatToString.h"
 
 void SerialComm::init(Sensor *temp, Sensor *humidity, TimerTrigger *eggTurner)
 {
@@ -25,12 +24,12 @@ void SerialComm::update(Subject* subject)
   if (subject == _temperatureSensor) {
     tempFloat = _temperatureSensor->getMeasurement();
     str[0] = 'T';
-    floatToString(&str[1], tempFloat, 2, 0, false);
+    dtostrf(tempFloat, 0, 2, &str[1]);
   }
   else if (subject == _humiditySensor) {
     tempFloat = _humiditySensor->getMeasurement();
     str[0] = 'H';
-    floatToString(&str[1], tempFloat, 2, 0, false);
+    dtostrf(tempFloat, 0, 2, &str[1]);
   }
   else if (subject == _eggTurner) {
     if (_eggTurner->getOnState())

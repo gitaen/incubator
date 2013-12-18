@@ -1,9 +1,6 @@
 #include <Arduino.h>
 #include <EEPROM.h>
 #include "Controller.h"
-extern "C" {
-#include "floatToString.h"
-}
 
 void Controller::init (Sensor *sensor, uint8_t pinNumber,
 		       float errorPoints[NUMBEROFFUZZYSETS],
