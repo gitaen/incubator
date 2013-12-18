@@ -43,19 +43,37 @@ Sensirion shtxx = Sensirion(DATAPIN, SCKPIN);
 TemperatureSensor temperatureSensor;; 
 HumiditySensor humiditySensor;
 
-float errorPoints[NUMBEROFFUZZYSETS] = {-1, 0, 1};
-uint8_t functions[NUMBEROFFUZZYSETS][NUMBEROFFUZZYSETS] =
-  {{1,0,0},
-   {0,1,0},
-   {0,0,1}};
+// float errorPoints[NUMBEROFFUZZYSETS] = {-1, 0, 1};
+// uint8_t functions[NUMBEROFFUZZYSETS][NUMBEROFFUZZYSETS] =
+//   {{1,0,0},
+//    {0,1,0},
+//    {0,0,1}};
 
-float deltaPoints[NUMBEROFFUZZYSETS] = {-0.25, 0, 0.25};
+// float deltaPoints[NUMBEROFFUZZYSETS] = {-0.25, 0, 0.25};
 
-uint8_t rules[NUMBEROFFUZZYSETS][NUMBEROFFUZZYSETS] = 
-  {{P, P, Z_E},  // error = N
-   {P, Z_E, N},  // error = Z_E
-   {Z_E, N, N}};  // error = P
-float outputFunction[NUMBEROFFUZZYSETS] = {-2, 0, 2};
+// uint8_t rules[NUMBEROFFUZZYSETS][NUMBEROFFUZZYSETS] = 
+//   {{P, P, Z_E},  // error = N
+//    {P, Z_E, N},  // error = Z_E
+//    {Z_E, N, N}};  // error = P
+// float outputFunction[NUMBEROFFUZZYSETS] = {-2, 0, 2};
+
+ float errorPoints[NUMBEROFFUZZYSETS] = {-2, -1, 0, 1, 2};
+ uint8_t functions[NUMBEROFFUZZYSETS][NUMBEROFFUZZYSETS] =
+   {{1,0,0,0,0},
+    {0,1,0,0,0},
+    {0,0,1,0,0},
+    {0,0,0,1,0},
+    {0,0,0,0,1}};
+
+ float deltaPoints[NUMBEROFFUZZYSETS] = {-0.05, -0.02, 0, 0.02, 0.05};
+
+ uint8_t rules[NUMBEROFFUZZYSETS][NUMBEROFFUZZYSETS] = 
+   {{L_P, L_P, L_P, S_P, Z_E},  // error = L_N
+    {L_P, L_P, S_P, Z_E, S_N},  // error = S_N
+    {L_P, S_P, Z_E, S_N, L_N},  // error = Z_E
+    {S_P, Z_E, S_N, L_N, L_N},  // error = S_P
+    {Z_E, S_N, L_N, L_N, L_N}}; // error = L_P
+ float outputFunction[NUMBEROFFUZZYSETS] = {-3, -1, 0, 1, 3};
 
 Controller humidityController;
 Controller temperatureController;
@@ -122,6 +140,8 @@ void setup (void){
   timerScreen.init(&lcd, "Turner", &eggTurnerTimer);
   timerScreen.activate(false);
 
+  temperatureController.setTarget(37.7);
+  humidityController.setTarget(55);
 }
 
 void loop (void) {
@@ -133,36 +153,9 @@ void loop (void) {
   float humidity;
   float dewPoint;
 
-//  float errorPoints[NUMBEROFFUZZYSETS] = {-5, -2.5, 0, 2.5, 5};
-//  uint8_t functions[NUMBEROFFUZZYSETS][NUMBEROFFUZZYSETS] =
-//    {{1,0,0,0,0},
-//     {0,1,0,0,0},
-//     {0,0,1,0,0},
-//     {0,0,0,1,0},
-//     {0,0,0,0,1}};
-
-//  float deltaPoints[NUMBEROFFUZZYSETS] = {-0.5, -0.25, 0, 0.25, 0.5};
-//  uint8_t deltaFunctions[NUMBEROFFUZZYSETS][NUMBEROFFUZZYSETS] =
-//    {{1,0,0,0,0},
-//     {0,1,0,0,0},
-//     {0,0,1,0,0},
-//     {0,0,0,1,0},
-//     {0,0,0,0,1}};
-
-//  uint8_t rules[NUMBEROFFUZZYSETS][NUMBEROFFUZZYSETS] = 
-//    {{L_P, L_P, L_P, S_P, Z_E},  // error = L_N
-//     {L_P, L_P, S_P, Z_E, S_N},  // error = S_N
-//     {L_P, S_P, Z_E, S_N, L_N},  // error = Z_E
-//     {S_P, Z_E, S_N, L_N, L_N},  // error = S_P
-//     {Z_E, S_N, L_N, L_N, L_N}}; // error = L_P
-//  float outputFunction[NUMBEROFFUZZYSETS] = {-10, -5, 0, 2, 4};
-
-
   Serial.println("Init");
 
   analogWrite(FANPIN, 255);
-  temperatureController.setTarget(37.7);
-  humidityController.setTarget(60);
 
   while (true) {
     delay(200);

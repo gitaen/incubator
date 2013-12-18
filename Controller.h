@@ -4,10 +4,11 @@
 #include "Sensor.h"
 #include "Subject.h"
 
-#define NUMBEROFFUZZYSETS 3
+//#define NUMBEROFFUZZYSETS 3
+#define NUMBEROFFUZZYSETS 5
 
-//enum FuzzySet {L_N, S_N, Z_E, S_P, L_P}; 
-enum FuzzySet {N, Z_E, P}; 
+enum FuzzySet {L_N, S_N, Z_E, S_P, L_P}; 
+//enum FuzzySet {N, Z_E, P}; 
 
 class Controller: public Subject
 {
