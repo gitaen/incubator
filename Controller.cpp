@@ -2,6 +2,9 @@
 #include <EEPROM.h>
 #include "Controller.h"
 
+#define MIN_POWER 0
+#define MAX_POWER 255
+
 void Controller::init (Sensor *sensor, uint8_t pinNumber,
 		       float errorPoints[NUMBEROFFUZZYSETS],
 		       uint8_t errorFunctions[NUMBEROFFUZZYSETS][NUMBEROFFUZZYSETS],
@@ -11,7 +14,7 @@ void Controller::init (Sensor *sensor, uint8_t pinNumber,
 		       float outputFunction[NUMBEROFFUZZYSETS]){
   _sensor = sensor;
   pin = pinNumber;
-  power = 0;
+  power = (MAX_POWER - MIN_POWER) / 2;
   target = 0;
 
   lastError = _sensor->getMeasurement() - target;
@@ -79,7 +82,7 @@ void Controller::control (void) {
     throttle -= 0.5;
 
   power = (uint8_t)constrain(power + 
-			     throttle, 0, 255);
+			     throttle, MIN_POWER, MAX_POWER);
 
   analogWrite (pin, power);
   
