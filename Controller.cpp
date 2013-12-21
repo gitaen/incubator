@@ -37,6 +37,10 @@ float Controller::getTarget (void) {
   return target;
 }
 
+uint8_t Controller::getPower (void) {
+  return power;
+}
+
 Sensor* Controller::getSensor(void) {
   return _sensor;
 }
@@ -78,9 +82,9 @@ void Controller::control (void) {
 			     throttle, 0, 255);
 
   analogWrite (pin, power);
-  Serial.print((long unsigned int)this);
-  Serial.print(" Power: ");
-  Serial.println(power);
+  
+  if ((int)throttle)
+    notify();
 }
 
 

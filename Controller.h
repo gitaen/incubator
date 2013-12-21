@@ -30,6 +30,7 @@ private:
 public:
   void setTarget(float targetValue);
   float getTarget(void);
+  uint8_t getPower(void);
   Sensor *getSensor();
   void init (Sensor *sensor, uint8_t pinNumber,  
 	     float errorPoints[NUMBEROFFUZZYSETS],

@@ -4,39 +4,54 @@
 #include <string.h>
 #include "SerialComm.h"
 
-void SerialComm::init(Sensor *temp, Sensor *humidity, TimerTrigger *eggTurner)
+void SerialComm::init(Sensor *temp, Sensor *humidity, TimerTrigger *eggTurner, 
+		      Controller *tempController, Controller *humidController)
 {
   _temperatureSensor = temp;
   _humiditySensor = humidity;
   _eggTurner = eggTurner;
+  _tempController = tempController;
+  _humidController = humidController;
 
   _temperatureSensor->attach(this);
   _humiditySensor->attach(this);
   _eggTurner->attach(this);
+  _tempController->attach(this);
+  _humidController->attach(this);
 }
 
 
 void SerialComm::update(Subject* subject)
 {
-  float tempFloat;
-  char str[7];
-
   if (subject == _temperatureSensor) {
-    tempFloat = _temperatureSensor->getMeasurement();
-    str[0] = 'T';
-    dtostrf(tempFloat, 0, 2, &str[1]);
+    temp = _temperatureSensor->getMeasurement();
+  } else if (subject == _humiditySensor) {
+    humid = _humiditySensor->getMeasurement();
+  } else if (subject == _eggTurner) {
+    turnerState = _eggTurner->getOnState();
+    turnerActive = _eggTurner->isActive();
+    turnerRemTime = _eggTurner->getTimeLeft();
+  } else if (subject == _tempController) {
+    tempPower = _tempController->getPower();
+  } else if (subject == _humidController) {
+    humidPower = _humidController->getPower();
   }
-  else if (subject == _humiditySensor) {
-    tempFloat = _humiditySensor->getMeasurement();
-    str[0] = 'H';
-    dtostrf(tempFloat, 0, 2, &str[1]);
-  }
-  else if (subject == _eggTurner) {
-    if (_eggTurner->getOnState())
-      strcpy(str,"EON");
-    else
-      strcpy(str,"EOFF");
-  }
+}
 
-  Serial.println(str);
+void SerialComm::refresh()
+{
+  Serial.print(temp);
+  Serial.print(' ');
+  Serial.print(humid);
+  Serial.print(' ');
+  Serial.print(turnerState);
+  Serial.print(' ');
+  Serial.print(turnerActive);
+  Serial.print(' ');
+  Serial.print(turnerRemTime);
+  Serial.print(' ');
+  Serial.print(tempPower);
+  Serial.print(' ');
+  Serial.print(humidPower);
+  Serial.println();
 }

@@ -62,15 +62,15 @@ HumiditySensor humiditySensor;
     {0,0,0,1,0},
     {0,0,0,0,1}};
 
- float deltaPoints[NUMBEROFFUZZYSETS] = {-0.05, -0.02, 0, 0.02, 0.05};
+ float deltaPoints[NUMBEROFFUZZYSETS] = {-0.10, -0.05, 0, 0.05, 0.10};
 
  uint8_t rules[NUMBEROFFUZZYSETS][NUMBEROFFUZZYSETS] = 
    {{L_P, L_P, L_P, S_P, Z_E},  // error = L_N
-    {L_P, L_P, S_P, Z_E, S_N},  // error = S_N
-    {L_P, S_P, Z_E, S_N, L_N},  // error = Z_E
-    {S_P, Z_E, S_N, L_N, L_N},  // error = S_P
+    {L_P, S_P, S_P, Z_E, S_N},  // error = S_N
+    {S_P, S_P, Z_E, S_N, S_N},  // error = Z_E
+    {S_P, Z_E, S_N, S_N, L_N},  // error = S_P
     {Z_E, S_N, L_N, L_N, L_N}}; // error = L_P
- float outputFunction[NUMBEROFFUZZYSETS] = {-3, -1, 0, 1, 3};
+ float outputFunction[NUMBEROFFUZZYSETS] = {-5, -2, 0, 2, 5};
 
 Controller humidityController;
 Controller temperatureController;
@@ -121,7 +121,7 @@ void setup (void){
 
   eggTurnerTimer.init(EGGTURNERPIN);
   serialComm.init((Sensor *)&temperatureSensor, (Sensor *)&humiditySensor, 
-  		  &eggTurnerTimer);
+  		  &eggTurnerTimer, &temperatureController, &humidityController);
   eggTurnerTimer.restore(TURNERADDR);
 
   lcd.begin(16,2);
@@ -148,7 +148,7 @@ void loop (void) {
   unsigned int rawData;
   unsigned long int now;
 
-  Serial.println("Init");
+  // Serial.println("Init");
 
   analogWrite(FANPIN, 255);
 
@@ -183,10 +183,12 @@ void loop (void) {
       eggTurnerTimer.check();
     }
 
-    if (!(tick_counter % 25) && !measActive) {
-      measActive = true;
-      measType = TEMP;
-      shtxx.meas(measType, &rawData, NONBLOCK);
+    if (!(tick_counter % 25)) {
+      if (!measActive) {
+	measActive = true;
+	measType = TEMP;
+	shtxx.meas(measType, &rawData, NONBLOCK);
+      }
     } 
 
     if (measActive && shtxx.measRdy()) {
@@ -207,6 +209,7 @@ void loop (void) {
       humiditySensor.update(humidity);
       temperatureController.control();
       humidityController.control();
+      serialComm.refresh();
     }
     
     if (!(tick_counter % 50)){
