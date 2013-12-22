@@ -74,7 +74,7 @@ void Controller::control (void) {
 //  infere(errorArray, deltaArray, rulesResultArray);
   throttle = defuzzify(errorArray, deltaArray);
 
-  throttle = throttle * elapsedSeconds;
+  // throttle = throttle * elapsedSeconds;
 
   if (throttle > 0)
     throttle += 0.5; //to round it
