@@ -54,7 +54,7 @@ HumiditySensor humiditySensor;
 //    {Z_E, N, N}};  // error = P
 // float outputFunction[NUMBEROFFUZZYSETS] = {-2, 0, 2};
 
- float errorPoints[NUMBEROFFUZZYSETS] = {-2, -1, 0, 1, 2};
+ float errorPoints[NUMBEROFFUZZYSETS] = {-1, -0.5, 0, 0.5, 1};
  uint8_t functions[NUMBEROFFUZZYSETS][NUMBEROFFUZZYSETS] =
    {{1,0,0,0,0},
     {0,1,0,0,0},
@@ -70,7 +70,7 @@ HumiditySensor humiditySensor;
     {S_P, S_P, Z_E, S_N, S_N},  // error = Z_E
     {S_P, Z_E, S_N, S_N, L_N},  // error = S_P
     {Z_E, S_N, L_N, L_N, L_N}}; // error = L_P
- float outputFunction[NUMBEROFFUZZYSETS] = {-5, -2, 0, 2, 5};
+ float outputFunction[NUMBEROFFUZZYSETS] = {-10, -5, 0, 5, 10};
 
 Controller humidityController;
 Controller temperatureController;
@@ -192,14 +192,21 @@ void loop (void) {
     } 
 
     if (measActive && shtxx.measRdy()) {
-      if (measType == TEMP) {
-	temperature = shtxx.calcTemp(rawData);
-	measType = HUMI;
+      switch(shtxx.measRdy()) {
+      case S_Meas_Rdy:
+	if (measType == TEMP) {
+	  temperature = shtxx.calcTemp(rawData);
+	  measType = HUMI;
+	  shtxx.meas(measType, &rawData, NONBLOCK);
+	} else {
+	  humidity = shtxx.calcHumi(rawData, temperature);
+	  measActive = false;
+	  measReady = true;
+	}
+	break;
+      case S_Err_CRC:
 	shtxx.meas(measType, &rawData, NONBLOCK);
-      } else {
-	humidity = shtxx.calcHumi(rawData, temperature);
-	measActive = false;
-	measReady = true;
+	break;
       }
     }
 
