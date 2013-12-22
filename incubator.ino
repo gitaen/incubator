@@ -11,6 +11,8 @@
 #include "Controller.h"
 #include "SerialComm.h"
 
+#define PERIOD 100
+
 #define NUMBEROFSCREENS 4
 #define SCKPIN 3
 #define DATAPIN 2
@@ -139,7 +141,7 @@ void setup (void){
 void loop (void) {
   unsigned long int lastPush = millis();
   uint8_t activeScreen = 0;
-  float step = 0.1;
+  const float step = 0.1;
   float temperature;
   float humidity;
   bool measActive = false;
@@ -147,6 +149,8 @@ void loop (void) {
   bool measReady = false;
   unsigned int rawData;
   unsigned long int now;
+  bool lastSelectRead = HIGH;
+  bool selectRead;
 
   // Serial.println("Init");
 
@@ -162,28 +166,29 @@ void loop (void) {
       }
     }
 
-    if (!digitalRead(SELECTBUTTON)){
-      lastPush = millis();
+    selectRead = digitalRead(SELECTBUTTON);
+    if (!selectRead && lastSelectRead) {
+      lastPush = now;
       screen[activeScreen]->activate(false);
       activeScreen = (activeScreen + 1) % NUMBEROFSCREENS;
       screen[activeScreen]->activate(true);
     }
 
     if (!digitalRead(INCREASEBUTTON)){
-      lastPush = millis();
+      lastPush = now;
       screen[activeScreen]->modify(step);
     }
 
     if (!digitalRead(DECREASEBUTTON)){
-      lastPush = millis();
+      lastPush = now;
       screen[activeScreen]->modify(-1 * step);
     }
 
-    if (!(tick_counter % 5)) {
+    if (!(tick_counter % 10)) {
       eggTurnerTimer.check();
     }
 
-    if (!(tick_counter % 25)) {
+    if (!(tick_counter % 50)) {
       if (!measActive) {
 	measActive = true;
 	measType = TEMP;
@@ -219,14 +224,15 @@ void loop (void) {
       serialComm.refresh();
     }
     
-    if (!(tick_counter % 50)){
+    if (!(tick_counter % 100)){
       temperatureController.save(TEMPADDR);
       humidityController.save(HUMIDADDR);
       eggTurnerTimer.save(TURNERADDR);
     }
     
+    lastSelectRead = selectRead;
     tick_counter++;
-    delay(200-(millis()-now));
+    delay(PERIOD-(millis()-now));
   }
 
 }
