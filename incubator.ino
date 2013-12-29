@@ -35,7 +35,7 @@
 #define HUMIDADDR 4
 #define TURNERADDR 8
 
-uint8_t tick_counter = 0;
+unsigned long int tick_counter = 0;
 
 LiquidCrystal lcd = LiquidCrystal(RSPIN, ENABLEPIN, D4PIN, D5PIN, D6PIN, D7PIN); 
 Sensirion shtxx = Sensirion(DATAPIN, SCKPIN);
@@ -56,7 +56,7 @@ HumiditySensor humiditySensor;
 //    {Z_E, N, N}};  // error = P
 // float outputFunction[NUMBEROFFUZZYSETS] = {-2, 0, 2};
 
- float errorPoints[NUMBEROFFUZZYSETS] = {-1, -0.5, 0, 0.5, 1};
+ float errorPoints[NUMBEROFFUZZYSETS] = {-1, -0.1, 0, 0.1, 1};
  uint8_t functions[NUMBEROFFUZZYSETS][NUMBEROFFUZZYSETS] =
    {{1,0,0,0,0},
     {0,1,0,0,0},
@@ -64,7 +64,7 @@ HumiditySensor humiditySensor;
     {0,0,0,1,0},
     {0,0,0,0,1}};
 
- float deltaPoints[NUMBEROFFUZZYSETS] = {-0.10, -0.05, 0, 0.05, 0.10};
+ float deltaPoints[NUMBEROFFUZZYSETS] = {-0.1, -0.02, 0, 0.02, 0.1};
 
  uint8_t rules[NUMBEROFFUZZYSETS][NUMBEROFFUZZYSETS] = 
    {{L_P, L_P, L_P, S_P, Z_E},  // error = L_N
@@ -72,7 +72,7 @@ HumiditySensor humiditySensor;
     {S_P, S_P, Z_E, S_N, S_N},  // error = Z_E
     {S_P, Z_E, S_N, S_N, L_N},  // error = S_P
     {Z_E, S_N, L_N, L_N, L_N}}; // error = L_P
- float outputFunction[NUMBEROFFUZZYSETS] = {-10, -5, 0, 5, 10};
+ float outputFunction[NUMBEROFFUZZYSETS] = {-8, -3, 0, 3, 8};
 
 Controller humidityController;
 Controller temperatureController;
@@ -158,7 +158,7 @@ void loop (void) {
 
   while (true) {
     now = millis();
-    if ((now - lastPush) > 5000){
+    if ((now - lastPush) > 10000){
       if (activeScreen != 0) {
     	screen[activeScreen]->activate(false);
     	activeScreen = 0;
@@ -188,11 +188,13 @@ void loop (void) {
       eggTurnerTimer.check();
     }
 
-    if (!(tick_counter % 50)) {
+    if (!(tick_counter % 100)) {
       if (!measActive) {
 	measActive = true;
 	measType = TEMP;
 	shtxx.meas(measType, &rawData, NONBLOCK);
+      } else {
+	Serial.println("A reading shouldn't be active!");
       }
     } 
 
@@ -210,6 +212,7 @@ void loop (void) {
 	}
 	break;
       case S_Err_CRC:
+	Serial.println("problem reading data");
 	shtxx.meas(measType, &rawData, NONBLOCK);
 	break;
       }

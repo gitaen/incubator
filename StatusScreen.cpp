@@ -33,7 +33,7 @@ void StatusScreen::update (Subject *subject) {
   	if (_timerTrigger->getOnState()) {
   	  _lcd->print("Eggs turning    ");
   	} else {
-  	  _lcd->print("Next:           ");
+  	  _lcd->print("Turn in         ");
   	  _lcd->setCursor(8,1);
   	  timeLeft = _timerTrigger->getTimeLeft();
   	  itoa(timeLeft/3600, str, 10);

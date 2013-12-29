@@ -1,5 +1,6 @@
 //#include <string.h>
 //#include <stdio.h>
+#include <Arduino.h>
 #include <HardwareSerial.h>
 #include <string.h>
 #include "SerialComm.h"
@@ -53,5 +54,7 @@ void SerialComm::refresh()
   Serial.print(tempPower);
   Serial.print(' ');
   Serial.print(humidPower);
+  Serial.print(' ');
+  Serial.print(millis());
   Serial.println();
 }
