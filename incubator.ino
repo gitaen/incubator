@@ -26,10 +26,10 @@
 #define INCREASEBUTTON 11
 #define RSPIN A0
 #define ENABLEPIN A1
-#define D4PIN A2
-#define D5PIN A3
-#define D6PIN A4
-#define D7PIN A5
+#define D4PIN A3
+#define D5PIN A2
+#define D6PIN A5
+#define D7PIN A4
 
 #define TEMPADDR 0
 #define HUMIDADDR 4
