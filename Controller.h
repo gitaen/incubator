@@ -3,12 +3,15 @@
 
 #include "Sensor.h"
 #include "Subject.h"
-
-//#define NUMBEROFFUZZYSETS 3
-#define NUMBEROFFUZZYSETS 5
-
-enum FuzzySet {L_N, S_N, Z_E, S_P, L_P}; 
-//enum FuzzySet {N, Z_E, P}; 
+#include <FuzzyRule.h>
+#include <FuzzyComposition.h>
+#include <Fuzzy.h>
+#include <FuzzyRuleConsequent.h>
+#include <FuzzyOutput.h>
+#include <FuzzyInput.h>
+#include <FuzzyIO.h>
+#include <FuzzySet.h>
+#include <FuzzyRuleAntecedent.h>
 
 class Controller: public Subject
 {
@@ -19,34 +22,30 @@ private:
   float target;
   float lastError;
   unsigned long lastTime;
-  float *_errorPoints;
-  uint8_t (*_errorFunctions)[NUMBEROFFUZZYSETS];
-  float *_deltaPoints;
-  uint8_t (*_deltaFunctions)[NUMBEROFFUZZYSETS];
-  uint8_t (*_rules)[NUMBEROFFUZZYSETS];
-  float *_outputFunction;
   uint8_t modified;
+  static Fuzzy *fuzzy;
+  static FuzzySet L_N;
+  static FuzzySet S_N;
+  static FuzzySet Z;
+  static FuzzySet S_P;
+  static FuzzySet L_P;
+  static FuzzyInput error;
+  static FuzzySet L_D;
+  static FuzzySet S_D;
+  static FuzzySet K;
+  static FuzzySet S_I;
+  static FuzzySet L_I;
+  static FuzzyOutput adjust;
 
 public:
+  Controller (Sensor *sensor, uint8_t pinNumber);
   void setTarget(float targetValue);
   float getTarget(void);
   uint8_t getPower(void);
   Sensor *getSensor();
-  void init (Sensor *sensor, uint8_t pinNumber,  
-	     float errorPoints[NUMBEROFFUZZYSETS],
-	     uint8_t errorFunctions[NUMBEROFFUZZYSETS][NUMBEROFFUZZYSETS],
-	     float DeltaPoints[NUMBEROFFUZZYSETS],
-	     uint8_t deltaFunctions[NUMBEROFFUZZYSETS][NUMBEROFFUZZYSETS],
-	     uint8_t rules[NUMBEROFFUZZYSETS][NUMBEROFFUZZYSETS],
-	     float outputFunction[NUMBEROFFUZZYSETS]);
   void control(void);
   void save(int address);
   void restore(int address);
-
-private:
-  float fuzzify(float error, float points[], uint8_t function[]);
-//  void infere(float *errorArray, float *deltaArray, float rulesResultArray[NUMBEROFFUZZYSETS][NUMBEROFFUZZYSETS]);
-  float defuzzify(float *errorArray, float *deltaArray);
 };
 
 #endif

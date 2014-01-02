@@ -1,6 +1,5 @@
 #include <Sensirion.h>
 #include <LiquidCrystal.h>
-//#include <stdio.h>
 #include "HumiditySensor.h"
 #include "TemperatureSensor.h"
 #include "Controller.h"
@@ -42,40 +41,8 @@ Sensirion shtxx = Sensirion(DATAPIN, SCKPIN);
 TemperatureSensor temperatureSensor;; 
 HumiditySensor humiditySensor;
 
-// float errorPoints[NUMBEROFFUZZYSETS] = {-1, 0, 1};
-// uint8_t functions[NUMBEROFFUZZYSETS][NUMBEROFFUZZYSETS] =
-//   {{1,0,0},
-//    {0,1,0},
-//    {0,0,1}};
-
-// float deltaPoints[NUMBEROFFUZZYSETS] = {-0.25, 0, 0.25};
-
-// uint8_t rules[NUMBEROFFUZZYSETS][NUMBEROFFUZZYSETS] = 
-//   {{P, P, Z_E},  // error = N
-//    {P, Z_E, N},  // error = Z_E
-//    {Z_E, N, N}};  // error = P
-// float outputFunction[NUMBEROFFUZZYSETS] = {-2, 0, 2};
-
- float errorPoints[NUMBEROFFUZZYSETS] = {-1, -0.1, 0, 0.1, 1};
- uint8_t functions[NUMBEROFFUZZYSETS][NUMBEROFFUZZYSETS] =
-   {{1,0,0,0,0},
-    {0,1,0,0,0},
-    {0,0,1,0,0},
-    {0,0,0,1,0},
-    {0,0,0,0,1}};
-
- float deltaPoints[NUMBEROFFUZZYSETS] = {-0.1, -0.02, 0, 0.02, 0.1};
-
- uint8_t rules[NUMBEROFFUZZYSETS][NUMBEROFFUZZYSETS] = 
-   {{L_P, L_P, L_P, S_P, Z_E},  // error = L_N
-    {L_P, S_P, S_P, Z_E, S_N},  // error = S_N
-    {S_P, S_P, Z_E, S_N, S_N},  // error = Z_E
-    {S_P, Z_E, S_N, S_N, L_N},  // error = S_P
-    {Z_E, S_N, L_N, L_N, L_N}}; // error = L_P
- float outputFunction[NUMBEROFFUZZYSETS] = {-8, -3, 0, 3, 8};
-
-Controller humidityController;
-Controller temperatureController;
+Controller humidityController((Sensor *)&humiditySensor, HUMIDIFIERPIN);
+Controller temperatureController((Sensor *)&temperatureSensor, HEATERPIN);
 
 TimerTrigger eggTurnerTimer;
 
@@ -108,17 +75,7 @@ void setup (void){
   pinMode(HEATERPIN, OUTPUT);
   pinMode(EGGTURNERPIN, OUTPUT);
 
-  humidityController.init((Sensor *)&humiditySensor, HUMIDIFIERPIN,
-  		    errorPoints, functions, 
-  		    deltaPoints, functions, 
-                    rules, outputFunction);
   humidityController.restore(HUMIDADDR);
-
-
-  temperatureController.init((Sensor *)&temperatureSensor, HEATERPIN,
-    		    errorPoints, functions, 
-  		    deltaPoints, functions, 
-                  rules, outputFunction);
   temperatureController.restore(TEMPADDR);
 
   eggTurnerTimer.init(EGGTURNERPIN);
