@@ -27,7 +27,7 @@ void TimerTrigger::check(void) {
 	onState = true;
 	timeLeft = ONTIME;
 	lastMillis = millis();
-	analogWrite(pin, 127);
+	analogWrite(pin, 255);
 	notify();
       }
     }
