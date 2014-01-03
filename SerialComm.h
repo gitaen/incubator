@@ -16,6 +16,8 @@ private:
   Controller *_humidController;
   float temp;
   float humid;
+  float tempTarget;
+  float humidTarget;
   uint8_t tempPower;
   uint8_t humidPower;
   bool turnerActive;

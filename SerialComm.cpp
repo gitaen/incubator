@@ -19,6 +19,8 @@ void SerialComm::init(Sensor *temp, Sensor *humidity, TimerTrigger *eggTurner,
   _eggTurner->attach(this);
   _tempController->attach(this);
   _humidController->attach(this);
+  update(tempController);
+  update(humidController);
 }
 
 
@@ -34,8 +36,10 @@ void SerialComm::update(Subject* subject)
     turnerRemTime = _eggTurner->getTimeLeft();
   } else if (subject == _tempController) {
     tempPower = _tempController->getPower();
+    tempTarget = _tempController->getTarget();
   } else if (subject == _humidController) {
     humidPower = _humidController->getPower();
+    humidTarget = _humidController->getTarget();
   }
 }
 
@@ -51,7 +55,11 @@ void SerialComm::refresh()
   Serial.print(' ');
   Serial.print(turnerRemTime);
   Serial.print(' ');
+  Serial.print(tempTarget);
+  Serial.print(' ');
   Serial.print(tempPower);
+  Serial.print(' ');
+  Serial.print(humidTarget);
   Serial.print(' ');
   Serial.print(humidPower);
   Serial.print(' ');
