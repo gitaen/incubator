@@ -6,10 +6,11 @@
 class Sensor: public Subject
 {
   public:
-    Sensor () {};
-    virtual void update(float) {};
-    virtual float getMeasurement(void) {};
-    virtual char getMeasureUnits(void) {};
+     void update(float);
+    float getMeasurement(void);
+
+ private:
+    float value = 0;
 };
 
 #endif

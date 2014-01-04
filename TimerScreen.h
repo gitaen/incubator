@@ -12,10 +12,10 @@ class TimerScreen: public Observer, public Screen
 private:
   LiquidCrystal *_lcd;
   TimerTrigger *_timer;
-  char *name;
+  const __FlashStringHelper *name;
   
 public:
-  void init(LiquidCrystal *lcd, char *nameString, TimerTrigger *timer);
+  void init(LiquidCrystal *lcd, const __FlashStringHelper *nameString, TimerTrigger *timer);
   void modify(float step);
   void update(Subject *subject);
   void activate(bool act);

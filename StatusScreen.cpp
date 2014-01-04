@@ -23,17 +23,17 @@ void StatusScreen::update (Subject *subject) {
   
   if (activated) {
     if (subject == _temperatureSensor) {
-      updateSensor (_temperatureSensor, 2, 0);
+      updateSensor (_temperatureSensor, 2, 0, 'C');
     }
     if (subject == _humiditySensor) {
-      updateSensor (_humiditySensor, 10, 0);
+      updateSensor (_humiditySensor, 10, 0, '%');
     } else if (subject == _timerTrigger) {
       _lcd->setCursor(0,1);
       if (_timerTrigger->isActive()){
   	if (_timerTrigger->getOnState()) {
-  	  _lcd->print("Eggs turning    ");
+  	  _lcd->print(F("Eggs turning    "));
   	} else {
-  	  _lcd->print("Turn in         ");
+  	  _lcd->print(F("Turn in         "));
   	  _lcd->setCursor(8,1);
   	  timeLeft = _timerTrigger->getTimeLeft();
   	  itoa(timeLeft/3600, str, 10);
@@ -41,17 +41,17 @@ void StatusScreen::update (Subject *subject) {
   	  _lcd->print(':');
   	  itoa((timeLeft%3600)/60, str, 10);
   	  if (strlen(str) < 2)
-  	    _lcd->print("0");
+  	    _lcd->print('0');
   	  _lcd->print(str);
   	  _lcd->print(':');
   	  itoa(timeLeft%60, str, 10);
   	  if (strlen(str) < 2)
-  	    _lcd->print("0");
+  	    _lcd->print('0');
   	  _lcd->print(str);
   	}
       }
       else {
-  	_lcd->print("Turner off");
+  	_lcd->print(F("Turner off"));
       }
     }
   }
@@ -64,9 +64,9 @@ void StatusScreen::activate(bool act) {
 
   if (activated) {
     _lcd->clear();
-    _lcd->print("T:");
+    _lcd->print(F("T:"));
     _lcd->setCursor(8,0);
-    _lcd->print("H:");
+    _lcd->print(F("H:"));
 
     update(_temperatureSensor);
     update(_humiditySensor);
@@ -75,16 +75,15 @@ void StatusScreen::activate(bool act) {
 }
 
 
-void StatusScreen::updateSensor(Sensor *sensor, uint8_t col, uint8_t row) {
+void StatusScreen::updateSensor(Sensor *sensor, uint8_t col, uint8_t row, char measureUnit)
+{
   float tempFloat;
-  char str[6];
-  char measureUnits;
+  char str[5];
 
-  measureUnits = sensor->getMeasureUnits();
   tempFloat = sensor->getMeasurement();
   dtostrf(tempFloat, 4, 1, str);
   _lcd->setCursor(col,row);
   _lcd->print(str);
-  _lcd->print(measureUnits);
+  _lcd->print(measureUnit);
 }
 

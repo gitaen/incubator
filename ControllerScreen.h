@@ -15,10 +15,12 @@ class ControllerScreen: public Observer, public Screen
 private:
   LiquidCrystal *_lcd;
   Controller *_controller;
-  char *name;
+  char _measureUnit;
+  const __FlashStringHelper *name;
   
 public:
-  void init(LiquidCrystal *lcd, char *nameString, Controller *controller);
+  void init(LiquidCrystal *lcd, const __FlashStringHelper *nameString, Controller *controller,
+	    char measureUnit);
   void modify(float step);
   void update(Subject *subject);
   void activate(bool act);

@@ -2,7 +2,7 @@
 #include "TimerScreen.h"
 #include "MemoryTest.h"
 
-void TimerScreen::init(LiquidCrystal *lcd, char *nameString, 
+void TimerScreen::init(LiquidCrystal *lcd, const __FlashStringHelper *nameString, 
 			    TimerTrigger *timer) {
   _lcd = lcd;
   _timer = timer;
@@ -17,9 +17,9 @@ void TimerScreen::update (Subject *subject) {
   if (activated) {
     _lcd->setCursor(0,1);
     if (_timer->isActive())
-      _lcd->print("on ");
+      _lcd->print(F("on "));
     else
-      _lcd->print("off");
+      _lcd->print(F("off"));
   }
 }
 
@@ -30,9 +30,9 @@ void TimerScreen::activate(bool act) {
 
   if (activated) {
     _lcd->clear();
-    _lcd->print("Set ");
+    _lcd->print(F("Set "));
     _lcd->print(name);
-    _lcd->print(":");
+    _lcd->print(':');
     update(_timer);
    }
 }

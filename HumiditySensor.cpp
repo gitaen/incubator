@@ -1,5 +1,4 @@
 #include "HumiditySensor.h"
-#include <HardwareSerial.h>
 
 HumiditySensor::HumiditySensor () {
   _humidity = 0;

@@ -1,7 +1,7 @@
 #include <Sensirion.h>
 #include <LiquidCrystal.h>
-#include "HumiditySensor.h"
-#include "TemperatureSensor.h"
+// #include <MemoryFree.h>
+#include "Sensor.h"
 #include "Controller.h"
 #include "StatusScreen.h"
 #include "ControllerScreen.h"
@@ -34,15 +34,15 @@
 #define HUMIDADDR 4
 #define TURNERADDR 8
 
-unsigned long int tick_counter = 0;
+uint8_t tick_counter = 0;
 
 LiquidCrystal lcd = LiquidCrystal(RSPIN, ENABLEPIN, D4PIN, D5PIN, D6PIN, D7PIN); 
 Sensirion shtxx = Sensirion(DATAPIN, SCKPIN);
-TemperatureSensor temperatureSensor;; 
-HumiditySensor humiditySensor;
+Sensor temperatureSensor;
+Sensor humiditySensor;
 
-Controller humidityController((Sensor *)&humiditySensor, HUMIDIFIERPIN);
-Controller temperatureController((Sensor *)&temperatureSensor, HEATERPIN);
+Controller *humidityController;
+Controller *temperatureController;
 
 TimerTrigger eggTurnerTimer;
 
@@ -61,6 +61,10 @@ Screen *screen[NUMBEROFSCREENS] = {&statusScreen,
 
 void setup (void){
   Serial.begin(9600);
+  humidityController = new Controller(&humiditySensor, HUMIDIFIERPIN);
+  temperatureController = new Controller(&temperatureSensor, HEATERPIN);
+  // Serial.println(freeMemory());
+
   pinMode(SELECTBUTTON, INPUT);
   digitalWrite(SELECTBUTTON, HIGH);
   pinMode(INCREASEBUTTON, INPUT);
@@ -75,24 +79,27 @@ void setup (void){
   pinMode(HEATERPIN, OUTPUT);
   pinMode(EGGTURNERPIN, OUTPUT);
 
-  humidityController.restore(HUMIDADDR);
-  temperatureController.restore(TEMPADDR);
+  humidityController->restore(HUMIDADDR);
+  temperatureController->restore(TEMPADDR);
 
   eggTurnerTimer.init(EGGTURNERPIN);
-  serialComm.init((Sensor *)&temperatureSensor, (Sensor *)&humiditySensor, 
-  		  &eggTurnerTimer, &temperatureController, &humidityController);
+  serialComm.init(&eggTurnerTimer, temperatureController, humidityController);
   eggTurnerTimer.restore(TURNERADDR);
 
   lcd.begin(16,2);
   statusScreen.init(&lcd, &temperatureSensor,
    		    &humiditySensor, &eggTurnerTimer);
   statusScreen.activate(true);
-  temperatureScreen.init(&lcd, "temp", &temperatureController);
+  temperatureScreen.init(&lcd, F("temp"), temperatureController, 'C');
   temperatureScreen.activate(false);
-  humidityScreen.init(&lcd, "RH", &humidityController);
+  humidityScreen.init(&lcd, F("RH"), humidityController, '%');
   humidityScreen.activate(false);
-  timerScreen.init(&lcd, "Turner", &eggTurnerTimer);
+  timerScreen.init(&lcd, F("Turner"), &eggTurnerTimer);
   timerScreen.activate(false);
+
+  while (!Serial.available()) {
+    delay (1000);
+  }
 }
 
 void loop (void) {
@@ -151,7 +158,7 @@ void loop (void) {
 	measType = TEMP;
 	shtxx.meas(measType, &rawData, NONBLOCK);
       } else {
-	Serial.println("A reading shouldn't be active!");
+	Serial.println(88888888);
       }
     } 
 
@@ -169,7 +176,7 @@ void loop (void) {
 	}
 	break;
       case S_Err_CRC:
-	Serial.println("problem reading data");
+	Serial.println(99999999);
 	shtxx.meas(measType, &rawData, NONBLOCK);
 	break;
       }
@@ -179,19 +186,20 @@ void loop (void) {
       measReady = false;
       temperatureSensor.update(temperature);
       humiditySensor.update(humidity);
-      temperatureController.control();
-      humidityController.control();
+      temperatureController->control();
+      humidityController->control();
       serialComm.refresh();
     }
     
     if (!(tick_counter % 100)){
-      temperatureController.save(TEMPADDR);
-      humidityController.save(HUMIDADDR);
+      temperatureController->save(TEMPADDR);
+      humidityController->save(HUMIDADDR);
       eggTurnerTimer.save(TURNERADDR);
     }
     
     lastSelectRead = selectRead;
     tick_counter++;
+    tick_counter %= 100;
     delay(PERIOD-(millis()-now));
   }
 

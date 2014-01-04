@@ -23,7 +23,7 @@ public:
   void activate(bool act);
   
 private:
-  void updateSensor(Sensor *sensor, uint8_t col, uint8_t row);
+  void updateSensor(Sensor *sensor, uint8_t col, uint8_t row, char measureUnit);
 };
 
 #endif
