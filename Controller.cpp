@@ -20,17 +20,17 @@ FuzzySet Controller::S_P = FuzzySet(0, 0.1, 0.25, 1);
 FuzzySet Controller::L_P = FuzzySet(0.25, 1, 2, 2);
 
 FuzzyInput Controller::errorDeltaInput = FuzzyInput(2);
-FuzzySet Controller::L_NA = FuzzySet(-0.02, -0.02, -0.01, -0.005);
-FuzzySet Controller::S_NA = FuzzySet(-0.01, -0.005, -0.005, 0);
-FuzzySet Controller::Z_A = FuzzySet(-0.005, 0, 0, 0.005);
-FuzzySet Controller::S_PA = FuzzySet(0, 0.005, 0.005, 0.01);
-FuzzySet Controller::L_PA = FuzzySet(0.005, 0.01, 0.02, 0.02);
+FuzzySet Controller::L_NA = FuzzySet(-0.1, -0.1, -0.02, -0.005);
+FuzzySet Controller::S_NA = FuzzySet(-0.01, -0.005, -0.001, 0);
+FuzzySet Controller::Z_A = FuzzySet(-0.001, 0, 0, 0.001);
+FuzzySet Controller::S_PA = FuzzySet(0, 0.001, 0.005, 0.01);
+FuzzySet Controller::L_PA = FuzzySet(0.005, 0.02, 0.1, 0.1);
 
 FuzzyOutput Controller::adjust = FuzzyOutput(1);
 FuzzySet Controller::L_D = FuzzySet(-64, -64, -64, 0);
-FuzzySet Controller::S_D = FuzzySet(-20, -20, -20, 0);
+FuzzySet Controller::S_D = FuzzySet(-16, -16, -16, 0);
 FuzzySet Controller::K = FuzzySet(0,0,0,0);
-FuzzySet Controller::S_I = FuzzySet(0, 20, 20, 20);
+FuzzySet Controller::S_I = FuzzySet(0, 16, 16, 16);
 FuzzySet Controller::L_I = FuzzySet(0, 64, 64, 64);
 
 extern unsigned int debugTmp;
