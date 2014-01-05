@@ -1,7 +1,6 @@
 #include <Sensirion.h>
 #include <LiquidCrystal.h>
-// #include <MemoryFree.h>
-#include "Sensor.h"
+#include <MemoryFree.h>
 #include "Controller.h"
 #include "StatusScreen.h"
 #include "ControllerScreen.h"
@@ -38,8 +37,6 @@ uint8_t tick_counter = 0;
 
 LiquidCrystal lcd = LiquidCrystal(RSPIN, ENABLEPIN, D4PIN, D5PIN, D6PIN, D7PIN); 
 Sensirion shtxx = Sensirion(DATAPIN, SCKPIN);
-Sensor temperatureSensor;
-Sensor humiditySensor;
 
 Controller *humidityController;
 Controller *temperatureController;
@@ -59,11 +56,13 @@ Screen *screen[NUMBEROFSCREENS] = {&statusScreen,
 				   &humidityScreen,
 				   &timerScreen};
 
+float temperature;
+float humidity;
+
 void setup (void){
-  Serial.begin(9600);
-  humidityController = new Controller(&humiditySensor, HUMIDIFIERPIN);
-  temperatureController = new Controller(&temperatureSensor, HEATERPIN);
-  // Serial.println(freeMemory());
+  Serial.begin(115200);
+  humidityController = new Controller(&humidity, HUMIDIFIERPIN);
+  temperatureController = new Controller(&temperature, HEATERPIN);
 
   pinMode(SELECTBUTTON, INPUT);
   digitalWrite(SELECTBUTTON, HIGH);
@@ -87,34 +86,30 @@ void setup (void){
   eggTurnerTimer.restore(TURNERADDR);
 
   lcd.begin(16,2);
-  statusScreen.init(&lcd, &temperatureSensor,
-   		    &humiditySensor, &eggTurnerTimer);
-  statusScreen.activate(true);
+  statusScreen.init(&lcd, &temperature,
+   		    &humidity, &eggTurnerTimer);
   temperatureScreen.init(&lcd, F("temp"), temperatureController, 'C');
-  temperatureScreen.activate(false);
   humidityScreen.init(&lcd, F("RH"), humidityController, '%');
-  humidityScreen.activate(false);
   timerScreen.init(&lcd, F("Turner"), &eggTurnerTimer);
-  timerScreen.activate(false);
 
-  while (!Serial.available()) {
-    delay (1000);
-  }
+  // while (!Serial.available()) {
+  //   delay (1000);
+  // }
 }
 
 void loop (void) {
   unsigned long int lastPush = millis();
   uint8_t activeScreen = 0;
   const float step = 0.1;
-  float temperature;
-  float humidity;
   bool measActive = false;
   uint8_t measType = TEMP;
   bool measReady = false;
   unsigned int rawData;
   unsigned long int now;
-  bool lastSelectRead = HIGH;
+  bool lastSelectRead = digitalRead(SELECTBUTTON);
   bool selectRead;
+  bool lastEncRead = digitalRead(ENCODERPIN);
+  bool encRead;
 
   // Serial.println("Init");
 
@@ -124,32 +119,39 @@ void loop (void) {
     now = millis();
     if ((now - lastPush) > 10000){
       if (activeScreen != 0) {
-    	screen[activeScreen]->activate(false);
     	activeScreen = 0;
-    	screen[activeScreen]->activate(true);
+	screen[activeScreen]->refresh();
       }
     }
 
     selectRead = digitalRead(SELECTBUTTON);
     if (!selectRead && lastSelectRead) {
       lastPush = now;
-      screen[activeScreen]->activate(false);
       activeScreen = (activeScreen + 1) % NUMBEROFSCREENS;
-      screen[activeScreen]->activate(true);
+      screen[activeScreen]->refresh();
     }
 
     if (!digitalRead(INCREASEBUTTON)){
       lastPush = now;
       screen[activeScreen]->modify(step);
+      screen[activeScreen]->refresh();
     }
 
     if (!digitalRead(DECREASEBUTTON)){
       lastPush = now;
       screen[activeScreen]->modify(-1 * step);
+      screen[activeScreen]->refresh();
+    }
+
+    encRead = digitalRead(ENCODERPIN);
+    if (encRead != lastEncRead) {
+      lastEncRead = encRead;
+      eggTurnerTimer.step();
     }
 
     if (!(tick_counter % 10)) {
       eggTurnerTimer.check();
+      screen[activeScreen]->refresh();
     }
 
     if (!(tick_counter % 100)) {
@@ -184,10 +186,9 @@ void loop (void) {
 
     if (measReady) {
       measReady = false;
-      temperatureSensor.update(temperature);
-      humiditySensor.update(humidity);
       temperatureController->control();
       humidityController->control();
+      screen[activeScreen]->refresh();
       serialComm.refresh();
     }
     
@@ -198,8 +199,7 @@ void loop (void) {
     }
     
     lastSelectRead = selectRead;
-    tick_counter++;
-    tick_counter %= 100;
+    tick_counter = ++tick_counter % 100;
     delay(PERIOD-(millis()-now));
   }
 

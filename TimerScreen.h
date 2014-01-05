@@ -2,12 +2,10 @@
 #define _TIMERSCREEN_
 
 #include <LiquidCrystal.h>
-#include "Observer.h"
-#include "Subject.h"
 #include "TimerTrigger.h"
 #include "Screen.h"
 
-class TimerScreen: public Observer, public Screen
+class TimerScreen: public Screen
 {
 private:
   LiquidCrystal *_lcd;
@@ -17,8 +15,7 @@ private:
 public:
   void init(LiquidCrystal *lcd, const __FlashStringHelper *nameString, TimerTrigger *timer);
   void modify(float step);
-  void update(Subject *subject);
-  void activate(bool act);
+  void refresh();
 
 };
 

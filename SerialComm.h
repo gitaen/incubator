@@ -3,7 +3,6 @@
 
 #include "Sensor.h"
 #include "TimerTrigger.h"
-#include "Observer.h"
 #include "Controller.h"
 
 class SerialComm

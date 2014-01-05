@@ -1,8 +1,6 @@
 #ifndef _CONTROLLER_
 #define _CONTROLLER_
 
-#include "Sensor.h"
-#include "Subject.h"
 #include <FuzzyRule.h>
 #include <FuzzyComposition.h>
 #include <Fuzzy.h>
@@ -13,10 +11,10 @@
 #include <FuzzySet.h>
 #include <FuzzyRuleAntecedent.h>
 
-class Controller: public Subject
+class Controller
 {
 private:
-  Sensor *_sensor;
+  float *_sensor;
   uint8_t pin;
   uint8_t power;
   float target;
@@ -29,7 +27,13 @@ private:
   static FuzzySet Z;
   static FuzzySet S_P;
   static FuzzySet L_P;
-  static FuzzyInput error;
+  static FuzzyInput errorInput;
+  static FuzzySet L_NA;
+  static FuzzySet S_NA;
+  static FuzzySet Z_A;
+  static FuzzySet S_PA;
+  static FuzzySet L_PA;
+  static FuzzyInput errorDeltaInput;
   static FuzzySet L_D;
   static FuzzySet S_D;
   static FuzzySet K;
@@ -38,11 +42,11 @@ private:
   static FuzzyOutput adjust;
 
 public:
-  Controller (Sensor *sensor, uint8_t pinNumber);
+  Controller (float *sensor, uint8_t pinNumber);
   void setTarget(float targetValue);
   float getTarget(void);
   uint8_t getPower(void);
-  Sensor *getSensor();
+  float *getSensor();
   void control(void);
   void save(int address);
   void restore(int address);

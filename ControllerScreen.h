@@ -2,15 +2,13 @@
 #define _CONTROLLERSCREEN_
 
 #include <LiquidCrystal.h>
-#include "Observer.h"
-#include "Subject.h"
 #include "Controller.h"
 #include "Screen.h"
 
 #define MINVALUE 0.0
 #define MAXVALUE 100.0
 
-class ControllerScreen: public Observer, public Screen
+class ControllerScreen: public Screen
 {
 private:
   LiquidCrystal *_lcd;
@@ -22,8 +20,7 @@ public:
   void init(LiquidCrystal *lcd, const __FlashStringHelper *nameString, Controller *controller,
 	    char measureUnit);
   void modify(float step);
-  void update(Subject *subject);
-  void activate(bool act);
+  void refresh();
 
 };
 

@@ -5,7 +5,7 @@ import serial
 import sys
 import time
 
-ser = serial.Serial(sys.argv[1], 9600)
+ser = serial.Serial(sys.argv[1], 115200)
 
 temp = []
 power = []
@@ -25,8 +25,8 @@ while 1:
     print reading
     
     now = int(time.time())-start
-    temp.append([now, reading[0]])
-    power.append([now, reading[5]])
+    temp.append([now, reading[1]])
+    power.append([now, reading[3]])
 
     if len(temp) > 60:
         temp = temp[-60:]
