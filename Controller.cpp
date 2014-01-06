@@ -124,13 +124,17 @@ Controller::Controller (float *sensor, uint8_t pinNumber) {
     LargeIncrease->addOutput(&L_I);
     
     fuzzy->addFuzzyRule(new FuzzyRule(i++, ifLargeNegative, LargeIncrease));
-    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallNegativeAndDecreasing, MediumIncrease));
+    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallNegativeAndQuicklyDecreasing, MediumIncrease));
+    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallNegativeAndSlowlyDecreasing, SmallIncrease));
     fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallNegativeAndNotMoving, SmallIncrease));
-    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallNegativeAndQuicklyIncreasing, SmallDecrease));
-    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifZero, Keep));
-    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallPositiveAndQuicklyDecreasing, SmallIncrease));
+    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallNegativeAndSlowlyIncreasing, Keep));
+    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallNegativeAndQuicklyIncreasing, MediumDecrease));
+    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifZeroAndNotMoving, Keep));
+    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallPositiveAndQuicklyDecreasing, MediumIncrease));
+    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallPositiveAndSlowlyDecreasing, Keep));
     fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallPositiveAndNotMoving, SmallDecrease));
-    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallPositiveAndIncreasing, MediumDecrease));
+    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallPositiveAndSlowlyIncreasing, SmallDecrease));
+    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallPositiveAndQuicklyIncreasing, MediumDecrease));
     fuzzy->addFuzzyRule(new FuzzyRule(i++, ifLargePositive, LargeDecrease));
   } 
 }
