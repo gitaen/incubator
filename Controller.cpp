@@ -232,7 +232,7 @@ void Controller::control (void) {
     throttle -= 0.5;
 
   power = (uint8_t)constrain(power + 
-   			     throttle, MIN_POWER, MAX_POWER);
+   			     (int)throttle, MIN_POWER, MAX_POWER);
 
   analogWrite (pin, power);
 }
