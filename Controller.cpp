@@ -6,34 +6,34 @@
 #define MIN_POWER 0
 #define MAX_POWER 255
 
-#define NUM_RULES 9
+#define NUM_RULES 13
 
 //#define DEBUG
 
 Fuzzy *Controller::fuzzy = NULL;
 
 FuzzyInput Controller::errorInput = FuzzyInput(1);
-FuzzySet Controller::L_N = FuzzySet(-2, -2, -1.5, -0.75);
-FuzzySet Controller::S_N = FuzzySet(-1.5, -0.75, -0.05, 0);
+FuzzySet Controller::L_N = FuzzySet(-3, -3, -2.75, -0.5);
+FuzzySet Controller::S_N = FuzzySet(-2.75, -0.5, -0.05, 0);
 FuzzySet Controller::Z = FuzzySet(-0.05, 0, 0, 0.05);
-FuzzySet Controller::S_P = FuzzySet(0, 0.05, 0.75, 1);
-FuzzySet Controller::L_P = FuzzySet(0.75, 1.5, 2, 2);
+FuzzySet Controller::S_P = FuzzySet(0, 0.05, 0.5, 2.75);
+FuzzySet Controller::L_P = FuzzySet(0.5, 2.75, 3, 3);
 
 FuzzyInput Controller::errorDeltaInput = FuzzyInput(2);
-FuzzySet Controller::L_NA = FuzzySet(-0.1, -0.1, -0.02, -0.005);
-FuzzySet Controller::S_NA = FuzzySet(-0.02, -0.005, -0.0001, 0);
-FuzzySet Controller::Z_A = FuzzySet(-0.0001, 0, 0, 0.0001);
-FuzzySet Controller::S_PA = FuzzySet(0, 0.0001, 0.005, 0.02);
-FuzzySet Controller::L_PA = FuzzySet(0.005, 0.02, 0.1, 0.1);
+FuzzySet Controller::L_NA = FuzzySet(-0.1, -0.1, -0.01, -0.004);
+FuzzySet Controller::S_NA = FuzzySet(-0.01, -0.004, -0.0025, 0);
+FuzzySet Controller::Z_A = FuzzySet(-0.0025, 0, 0, 0.0025);
+FuzzySet Controller::S_PA = FuzzySet(0, 0.0025, 0.004, 0.01);
+FuzzySet Controller::L_PA = FuzzySet(0.004, 0.01, 0.1, 0.1);
 
 FuzzyOutput Controller::adjust = FuzzyOutput(1);
-FuzzySet Controller::L_D = FuzzySet(-32, -32, -32, 0);
+FuzzySet Controller::L_D = FuzzySet(-24, -24, -24, 0);
 FuzzySet Controller::M_D = FuzzySet(-8, -8, -8, 0);
-FuzzySet Controller::S_D = FuzzySet(-3, -3, -3, 0);
+FuzzySet Controller::S_D = FuzzySet(-2, -2, -2, 0);
 FuzzySet Controller::K = FuzzySet(0,0,0,0);
-FuzzySet Controller::S_I = FuzzySet(0, 3, 3, 3);
+FuzzySet Controller::S_I = FuzzySet(0, 2, 2, 2);
 FuzzySet Controller::M_I = FuzzySet(0, 8, 8, 8);
-FuzzySet Controller::L_I = FuzzySet(0, 32, 32, 32);
+FuzzySet Controller::L_I = FuzzySet(0, 24, 24, 24);
 
 Controller::Controller (float *sensor, uint8_t pinNumber) {
   int i = 1;
@@ -87,22 +87,28 @@ Controller::Controller (float *sensor, uint8_t pinNumber) {
 
     FuzzyRuleAntecedent* ifLargeNegative = new FuzzyRuleAntecedent();
     ifLargeNegative->joinSingle(&L_N);
-    FuzzyRuleAntecedent* Decreasing = new FuzzyRuleAntecedent();
-    Decreasing->joinWithOR(&L_NA, &S_NA);
-    FuzzyRuleAntecedent* ifSmallNegativeAndDecreasing = new FuzzyRuleAntecedent();
-    ifSmallNegativeAndDecreasing->joinWithAND(&S_N,Decreasing);
+    FuzzyRuleAntecedent* ifSmallNegativeAndQuicklyDecreasing = new FuzzyRuleAntecedent();
+    ifSmallNegativeAndQuicklyDecreasing->joinWithAND(&S_N,&L_NA);
+    FuzzyRuleAntecedent* ifSmallNegativeAndSlowlyDecreasing = new FuzzyRuleAntecedent();
+    ifSmallNegativeAndSlowlyDecreasing->joinWithAND(&S_N,&S_NA);
     FuzzyRuleAntecedent* ifSmallNegativeAndNotMoving = new FuzzyRuleAntecedent();
     ifSmallNegativeAndNotMoving->joinWithAND(&S_N,&Z_A);
+    FuzzyRuleAntecedent* ifSmallNegativeAndSlowlyIncreasing = new FuzzyRuleAntecedent();
+    ifSmallNegativeAndSlowlyIncreasing->joinWithAND(&S_N, &S_PA);
     FuzzyRuleAntecedent* ifSmallNegativeAndQuicklyIncreasing = new FuzzyRuleAntecedent();
     ifSmallNegativeAndQuicklyIncreasing->joinWithAND(&S_N, &L_PA);
-    FuzzyRuleAntecedent* ifZero = new FuzzyRuleAntecedent();
-    ifZero->joinSingle(&Z);
+    FuzzyRuleAntecedent* ifZeroAndNotMoving = new FuzzyRuleAntecedent();
+    ifZeroAndNotMoving->joinWithAND(&Z, &Z_A);
     FuzzyRuleAntecedent* Increasing = new FuzzyRuleAntecedent();
     Increasing->joinWithOR(&L_PA, &S_PA);
-    FuzzyRuleAntecedent* ifSmallPositiveAndIncreasing = new FuzzyRuleAntecedent();
-    ifSmallPositiveAndIncreasing->joinWithAND(&S_P,Increasing);
+    FuzzyRuleAntecedent* ifSmallPositiveAndSlowlyIncreasing = new FuzzyRuleAntecedent();
+    ifSmallPositiveAndSlowlyIncreasing->joinWithAND(&S_P,&S_PA);
+    FuzzyRuleAntecedent* ifSmallPositiveAndQuicklyIncreasing = new FuzzyRuleAntecedent();
+    ifSmallPositiveAndQuicklyIncreasing->joinWithAND(&S_P,&L_PA);
     FuzzyRuleAntecedent* ifSmallPositiveAndNotMoving = new FuzzyRuleAntecedent();
     ifSmallPositiveAndNotMoving->joinWithAND(&S_P,&Z_A);
+    FuzzyRuleAntecedent* ifSmallPositiveAndSlowlyDecreasing = new FuzzyRuleAntecedent();
+    ifSmallPositiveAndSlowlyDecreasing->joinWithAND(&S_P, &S_NA);
     FuzzyRuleAntecedent* ifSmallPositiveAndQuicklyDecreasing = new FuzzyRuleAntecedent();
     ifSmallPositiveAndQuicklyDecreasing->joinWithAND(&S_P, &L_NA);
     FuzzyRuleAntecedent* ifLargePositive = new FuzzyRuleAntecedent();
