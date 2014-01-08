@@ -7,14 +7,17 @@
 
 class SerialComm
 {
-private:
+ private:
   TimerTrigger *_eggTurner;
   Controller *_tempController;
   Controller *_humidController;
-
-public:
+  
+ public:
   void init(TimerTrigger *eggTurner, Controller *tempController, Controller *humidController);
-  void refresh();
+  void check();
+ private:
+  void getParameters();
+  void setParameters();
 };
 
 #endif

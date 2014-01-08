@@ -189,7 +189,6 @@ void loop (void) {
       temperatureController->control();
       humidityController->control();
       screen[activeScreen]->refresh();
-      serialComm.refresh();
     }
     
     if (!(tick_counter % 100)){
@@ -198,9 +197,12 @@ void loop (void) {
       eggTurnerTimer.save(TURNERADDR);
     }
     
+    serialComm.check();
     lastSelectRead = selectRead;
     tick_counter = ++tick_counter % 100;
-    delay(PERIOD-(millis()-now));
+    if ((millis()-now) < PERIOD) {
+      delay(PERIOD-(millis()-now));
+    }
   }
 
 }

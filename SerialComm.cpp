@@ -11,7 +11,21 @@ void SerialComm::init(TimerTrigger *eggTurner, Controller *tempController,
   _humidController = humidController;
 }
 
-void SerialComm::refresh()
+void SerialComm::check()
+{
+  char command;
+  
+  if (Serial.available()) {
+    command = Serial.read();
+    if (command == 'G') {
+      getParameters();
+    } else if (command == 'S') {
+      setParameters();
+    }
+  }
+}
+
+void SerialComm::getParameters()
 {
   Serial.print(millis());
   Serial.print(' ');
@@ -34,4 +48,27 @@ void SerialComm::refresh()
   Serial.print(_eggTurner->getTimeLeft());
   Serial.println();
   Serial.flush();
+}
+
+void SerialComm::setParameters()
+{
+  char parameter;
+  int intVal;
+  float floatVal;
+  
+  if (Serial.available()) {
+    parameter = Serial.read();
+    if (parameter == 'T') {
+      if (floatVal = Serial.parseFloat()) {
+	_tempController->setTarget(floatVal);
+      }
+    } else if (parameter == 'H') {
+      if (floatVal = Serial.parseFloat()) {
+	_humidController->setTarget(floatVal);
+      }
+    } else if (parameter == 'E') {
+      intVal = Serial.parseInt();
+      _eggTurner->activate(intVal);
+    }
+  }
 }
