@@ -27,13 +27,13 @@ FuzzySet Controller::S_PA = FuzzySet(0, 0.0025, 0.004, 0.01);
 FuzzySet Controller::L_PA = FuzzySet(0.004, 0.01, 0.1, 0.1);
 
 FuzzyOutput Controller::adjust = FuzzyOutput(1);
-FuzzySet Controller::L_D = FuzzySet(-24, -24, -24, 0);
-FuzzySet Controller::M_D = FuzzySet(-8, -8, -8, 0);
-FuzzySet Controller::S_D = FuzzySet(-2, -2, -2, 0);
-FuzzySet Controller::K = FuzzySet(0,0,0,0);
-FuzzySet Controller::S_I = FuzzySet(0, 2, 2, 2);
-FuzzySet Controller::M_I = FuzzySet(0, 8, 8, 8);
-FuzzySet Controller::L_I = FuzzySet(0, 24, 24, 24);
+FuzzySet Controller::L_D = FuzzySet(-18, -16, -16, -14);
+FuzzySet Controller::M_D = FuzzySet(-6, -4, -4, -2);
+FuzzySet Controller::S_D = FuzzySet(-4, -2, -2, 0);
+FuzzySet Controller::K = FuzzySet(-1,0,0,1);
+FuzzySet Controller::S_I = FuzzySet(0, 2, 2, 4);
+FuzzySet Controller::M_I = FuzzySet(2, 4, 4, 6);
+FuzzySet Controller::L_I = FuzzySet(14, 16, 16, 18);
 
 Controller::Controller (float *sensor, uint8_t pinNumber) {
   int i = 1;
@@ -134,9 +134,9 @@ Controller::Controller (float *sensor, uint8_t pinNumber) {
     fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallNegativeAndSlowlyDecreasing, SmallIncrease));
     fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallNegativeAndNotMoving, SmallIncrease));
     fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallNegativeAndSlowlyIncreasing, Keep));
-    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallNegativeAndQuicklyIncreasing, MediumDecrease));
+    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallNegativeAndQuicklyIncreasing, SmallDecrease));
     fuzzy->addFuzzyRule(new FuzzyRule(i++, ifZeroAndNotMoving, Keep));
-    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallPositiveAndQuicklyDecreasing, MediumIncrease));
+    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallPositiveAndQuicklyDecreasing, SmallIncrease));
     fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallPositiveAndSlowlyDecreasing, Keep));
     fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallPositiveAndNotMoving, SmallDecrease));
     fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallPositiveAndSlowlyIncreasing, SmallDecrease));
