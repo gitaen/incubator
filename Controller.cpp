@@ -150,6 +150,10 @@ void Controller::setTarget (float targetValue) {
   modified = true;
 }
 
+void Controller::setMaxError (float max) {
+  maxError = max;
+}
+
 float Controller::getTarget (void) {
   return target;
 }
@@ -266,4 +270,8 @@ void Controller::restore(int address) {
   }
   
   modified = false;
+}
+
+bool Controller::getStatus() {
+  return fabs(*_sensor - target) <= maxError;
 }

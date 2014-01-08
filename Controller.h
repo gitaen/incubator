@@ -18,6 +18,7 @@ private:
   uint8_t pin;
   uint8_t power;
   float target;
+  float maxError;
   float lastError;
   unsigned long lastTime;
   uint8_t modified;
@@ -46,12 +47,14 @@ private:
 public:
   Controller (float *sensor, uint8_t pinNumber);
   void setTarget(float targetValue);
+  void setMaxError(float max);
   float getTarget(void);
   uint8_t getPower(void);
   float *getSensor();
   void control(void);
   void save(int address);
   void restore(int address);
+  bool getStatus();
 };
 
 #endif

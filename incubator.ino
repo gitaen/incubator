@@ -28,6 +28,8 @@
 #define D5PIN A2
 #define D6PIN A5
 #define D7PIN A4
+#define REDLEDPIN 12
+#define GREENLEDPIN 13
 
 #define TEMPADDR 0
 #define HUMIDADDR 4
@@ -77,9 +79,13 @@ void setup (void){
   pinMode(HUMIDIFIERPIN, OUTPUT);
   pinMode(HEATERPIN, OUTPUT);
   pinMode(EGGTURNERPIN, OUTPUT);
+  pinMode(REDLEDPIN, OUTPUT);
+  pinMode(GREENLEDPIN, OUTPUT);
 
   humidityController->restore(HUMIDADDR);
+  humidityController->setMaxError(2);
   temperatureController->restore(TEMPADDR);
+  temperatureController->setMaxError(0.2);
 
   eggTurnerTimer.init(EGGTURNERPIN);
   serialComm.init(&eggTurnerTimer, temperatureController, humidityController);
@@ -110,8 +116,9 @@ void loop (void) {
   bool selectRead;
   bool lastEncRead = digitalRead(ENCODERPIN);
   bool encRead;
+  bool problem = false;
 
-  // Serial.println("Init");
+  Serial.println("Init");
 
   analogWrite(FANPIN, 255);
 
@@ -198,6 +205,17 @@ void loop (void) {
     }
     
     serialComm.check();
+    problem = !temperatureController->getStatus() || !humidityController->getStatus()
+      || !eggTurnerTimer.getStatus();
+
+    if (problem) {
+      digitalWrite(GREENLEDPIN, LOW);
+      digitalWrite(REDLEDPIN, HIGH);
+    } else {
+      digitalWrite(GREENLEDPIN, HIGH);
+      digitalWrite(REDLEDPIN, LOW);
+    }
+
     lastSelectRead = selectRead;
     tick_counter = ++tick_counter % 100;
     if ((millis()-now) < PERIOD) {

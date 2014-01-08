@@ -3,6 +3,7 @@
 
 #define MAXSTEPS 6
 #define OFFTIME 7200
+#define MAXONTIME 10
 
 class TimerTrigger {
 private:
@@ -11,6 +12,7 @@ private:
   uint8_t pin;
   bool onState;
   bool active;
+  bool problem;
   uint8_t modified;
   uint8_t steps;
 
@@ -24,6 +26,7 @@ public:
   void step();
   void save(int address);
   void restore(int address);
+  bool getStatus();
 
 private:
   void updateTimeLeft(void);
