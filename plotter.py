@@ -26,7 +26,9 @@ h('set style data lines')
 start = int(time.time())
 lastTemp = 0;
 lastTime = start;
+ser.readline()
 while 1:
+    ser.write('G')
     reading = ser.readline().split()
     print reading
     
@@ -46,3 +48,4 @@ while 1:
     g.plot(temp)
     h.plot(power)
     d.plot(delta)
+    time.sleep(10)
