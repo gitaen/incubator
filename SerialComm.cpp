@@ -35,17 +35,23 @@ void SerialComm::getParameters()
   Serial.print(' ');
   Serial.print(_tempController->getPower());
   Serial.print(' ');
+  Serial.print(_tempController->getStatus());
+  Serial.print(' ');
   Serial.print(*_humidController->getSensor());
   Serial.print(' ');
   Serial.print(_humidController->getTarget());
   Serial.print(' ');
   Serial.print(_humidController->getPower());
   Serial.print(' ');
+  Serial.print(_humidController->getStatus());
+  Serial.print(' ');
   Serial.print(_eggTurner->getOnState());
   Serial.print(' ');
   Serial.print(_eggTurner->isActive());
   Serial.print(' ');
   Serial.print(_eggTurner->getTimeLeft());
+  Serial.print(' ');
+  Serial.print(_eggTurner->getStatus());
   Serial.println();
   Serial.flush();
 }
