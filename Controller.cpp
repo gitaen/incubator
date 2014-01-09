@@ -78,6 +78,7 @@ Controller::Controller (float *sensor, uint8_t pinNumber) {
     errorDeltaInput.addFuzzySet(&L_PA);
     fuzzy->addFuzzyInput(&errorDeltaInput);
 
+    adjust.addFuzzySet(&VL_D);
     adjust.addFuzzySet(&L_D);
     adjust.addFuzzySet(&M_D);
     adjust.addFuzzySet(&S_D);
@@ -85,6 +86,7 @@ Controller::Controller (float *sensor, uint8_t pinNumber) {
     adjust.addFuzzySet(&S_I);
     adjust.addFuzzySet(&M_I);
     adjust.addFuzzySet(&L_I);
+    adjust.addFuzzySet(&VL_I);
     fuzzy->addFuzzyOutput(&adjust);
 
     FuzzyRuleAntecedent* ifLargeNegativeAndQuicklyDecreasing = new FuzzyRuleAntecedent();
