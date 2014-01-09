@@ -20,22 +20,22 @@ FuzzySet Controller::S_P = FuzzySet(0, 0.5, 0.2, 2.75);
 FuzzySet Controller::L_P = FuzzySet(0.2, 2.75, 3, 3);
 
 FuzzyInput Controller::errorDeltaInput = FuzzyInput(2);
-FuzzySet Controller::L_NA = FuzzySet(-0.1, -0.1, -0.02, -0.005);
-FuzzySet Controller::S_NA = FuzzySet(-0.02, -0.005, -0.0025, 0);
+FuzzySet Controller::L_NA = FuzzySet(-0.1, -0.1, -0.015, -0.005);
+FuzzySet Controller::S_NA = FuzzySet(-0.015, -0.005, -0.0025, 0);
 FuzzySet Controller::Z_A = FuzzySet(-0.0025, 0, 0, 0.0025);
-FuzzySet Controller::S_PA = FuzzySet(0, 0.0025, 0.005, 0.02);
-FuzzySet Controller::L_PA = FuzzySet(0.005, 0.02, 0.1, 0.1);
+FuzzySet Controller::S_PA = FuzzySet(0, 0.0025, 0.005, 0.015);
+FuzzySet Controller::L_PA = FuzzySet(0.005, 0.015, 0.1, 0.1);
 
 FuzzyOutput Controller::adjust = FuzzyOutput(1);
-FuzzySet Controller::VL_D = FuzzySet(-18, -16, -16, -14);
-FuzzySet Controller::L_D = FuzzySet(-10, -8, -8, -6);
+FuzzySet Controller::VL_D = FuzzySet(-34, -32, -32, -30);
+FuzzySet Controller::L_D = FuzzySet(-18, -16, -16, -14);
 FuzzySet Controller::M_D = FuzzySet(-6, -4, -4, -2);
 FuzzySet Controller::S_D = FuzzySet(-4, -2, -2, 0);
 FuzzySet Controller::K = FuzzySet(-1,0,0,1);
 FuzzySet Controller::S_I = FuzzySet(0, 2, 2, 4);
 FuzzySet Controller::M_I = FuzzySet(2, 4, 4, 6);
-FuzzySet Controller::L_I = FuzzySet(6, 8, 8, 10);
-FuzzySet Controller::VL_I = FuzzySet(14, 16, 16, 18);
+FuzzySet Controller::L_I = FuzzySet(14, 16, 16, 18);
+FuzzySet Controller::VL_I = FuzzySet(30, 32, 32, 34);
 
 Controller::Controller (float *sensor, uint8_t pinNumber) {
   int i = 1;
