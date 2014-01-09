@@ -157,7 +157,7 @@ Controller::Controller (float *sensor, uint8_t pinNumber) {
     SmallIncrease->addOutput(&S_I);
     MediumIncrease->addOutput(&M_I);
     LargeIncrease->addOutput(&L_I);
-    VeryLargeIncrease->addOutput(&L_I);
+    VeryLargeIncrease->addOutput(&VL_I);
     
     fuzzy->addFuzzyRule(new FuzzyRule(i++, ifLargeNegativeAndQuicklyDecreasing, VeryLargeIncrease));
     fuzzy->addFuzzyRule(new FuzzyRule(i++, ifLargeNegativeAndSlowlyDecreasing, LargeIncrease));
