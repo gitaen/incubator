@@ -9,7 +9,7 @@
 #include "Controller.h"
 #include "SerialComm.h"
 
-#define PERIOD 100
+#define PERIOD 200
 
 #define NUMBEROFSCREENS 4
 #define SCKPIN 3
@@ -156,12 +156,12 @@ void loop (void) {
       eggTurnerTimer.step();
     }
 
-    if (!(tick_counter % 10)) {
+    if (!(tick_counter % 5)) {
       eggTurnerTimer.check();
       screen[activeScreen]->refresh();
     }
 
-    if (!(tick_counter % 100)) {
+    if (!(tick_counter % 50)) {
       if (!measActive) {
 	measActive = true;
 	measType = TEMP;
@@ -198,7 +198,7 @@ void loop (void) {
       screen[activeScreen]->refresh();
     }
     
-    if (!(tick_counter % 100)){
+    if (!(tick_counter % 50)){
       temperatureController->save(TEMPADDR);
       humidityController->save(HUMIDADDR);
       eggTurnerTimer.save(TURNERADDR);
