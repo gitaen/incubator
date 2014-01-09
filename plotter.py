@@ -27,9 +27,12 @@ start = int(time.time())
 lastTemp = 0;
 lastTime = start;
 ser.readline()
+f = open('/tmp/logs.txt', 'w')
 while 1:
     ser.write('G')
-    reading = ser.readline().split()
+    line = ser.readline()
+    f.write(line);
+    reading = line.split()
     print reading
     
     now = int(time.time())-start
@@ -40,10 +43,10 @@ while 1:
     lastTemp = temp[-1][1]
     lastTime = now;
 
-    if len(temp) > 30:
-        temp = temp[-30:]
-        power = power[-30:]
-        delta = delta[-30:]
+    # if len(temp) > 10:
+    #     temp = temp[-10:]
+    #     power = power[-10:]
+    #     delta = delta[-10:]
 
     g.plot(temp)
     h.plot(power)
