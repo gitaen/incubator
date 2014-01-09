@@ -15,7 +15,7 @@ Fuzzy *Controller::fuzzy = NULL;
 FuzzyInput Controller::errorInput = FuzzyInput(1);
 FuzzySet Controller::L_N = FuzzySet(-3, -3, -2.75, -0.2);
 FuzzySet Controller::S_N = FuzzySet(-2.75, -0.2, -0.05, 0);
-FuzzySet Controller::Z = FuzzySet(-0.05, 0, 0, 0.5);
+FuzzySet Controller::Z = FuzzySet(-0.05, 0, 0, 0.05);
 FuzzySet Controller::S_P = FuzzySet(0, 0.5, 0.2, 2.75);
 FuzzySet Controller::L_P = FuzzySet(0.2, 2.75, 3, 3);
 
