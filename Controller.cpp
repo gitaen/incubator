@@ -14,17 +14,17 @@ Fuzzy *Controller::fuzzy = NULL;
 
 FuzzyInput Controller::errorInput = FuzzyInput(1);
 FuzzySet Controller::L_N = FuzzySet(-3, -3, -2.75, -0.2);
-FuzzySet Controller::S_N = FuzzySet(-2.75, -0.2, -0.075, 0);
-FuzzySet Controller::Z = FuzzySet(-0.075, 0, 0, 0.75);
-FuzzySet Controller::S_P = FuzzySet(0, 0.75, 0.2, 2.75);
+FuzzySet Controller::S_N = FuzzySet(-2.75, -0.2, -0.05, 0);
+FuzzySet Controller::Z = FuzzySet(-0.05, 0, 0, 0.5);
+FuzzySet Controller::S_P = FuzzySet(0, 0.5, 0.2, 2.75);
 FuzzySet Controller::L_P = FuzzySet(0.2, 2.75, 3, 3);
 
 FuzzyInput Controller::errorDeltaInput = FuzzyInput(2);
-FuzzySet Controller::L_NA = FuzzySet(-0.1, -0.1, -0.01, -0.002);
-FuzzySet Controller::S_NA = FuzzySet(-0.01, -0.002, -0.001, 0);
-FuzzySet Controller::Z_A = FuzzySet(-0.001, 0, 0, 0.001);
-FuzzySet Controller::S_PA = FuzzySet(0, 0.001, 0.002, 0.01);
-FuzzySet Controller::L_PA = FuzzySet(0.002, 0.01, 0.1, 0.1);
+FuzzySet Controller::L_NA = FuzzySet(-0.1, -0.1, -0.02, -0.005);
+FuzzySet Controller::S_NA = FuzzySet(-0.02, -0.005, -0.0025, 0);
+FuzzySet Controller::Z_A = FuzzySet(-0.0025, 0, 0, 0.0025);
+FuzzySet Controller::S_PA = FuzzySet(0, 0.0025, 0.005, 0.02);
+FuzzySet Controller::L_PA = FuzzySet(0.005, 0.02, 0.1, 0.1);
 
 FuzzyOutput Controller::adjust = FuzzyOutput(1);
 FuzzySet Controller::VL_D = FuzzySet(-18, -16, -16, -14);
