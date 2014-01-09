@@ -35,6 +35,7 @@ private:
   static FuzzySet S_PA;
   static FuzzySet L_PA;
   static FuzzyInput errorDeltaInput;
+  static FuzzySet VL_D;
   static FuzzySet L_D;
   static FuzzySet M_D;
   static FuzzySet S_D;
@@ -42,6 +43,7 @@ private:
   static FuzzySet S_I;
   static FuzzySet M_I;
   static FuzzySet L_I;
+  static FuzzySet VL_I;
   static FuzzyOutput adjust;
 
 public:

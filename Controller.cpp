@@ -6,7 +6,7 @@
 #define MIN_POWER 0
 #define MAX_POWER 255
 
-#define NUM_RULES 13
+#define NUM_RULES 25
 
 //#define DEBUG
 
@@ -21,19 +21,21 @@ FuzzySet Controller::L_P = FuzzySet(0.2, 2.75, 3, 3);
 
 FuzzyInput Controller::errorDeltaInput = FuzzyInput(2);
 FuzzySet Controller::L_NA = FuzzySet(-0.1, -0.1, -0.01, -0.002);
-FuzzySet Controller::S_NA = FuzzySet(-0.01, -0.002, -0.0015, 0);
-FuzzySet Controller::Z_A = FuzzySet(-0.0015, 0, 0, 0.0015);
-FuzzySet Controller::S_PA = FuzzySet(0, 0.0015, 0.002, 0.01);
+FuzzySet Controller::S_NA = FuzzySet(-0.01, -0.002, -0.001, 0);
+FuzzySet Controller::Z_A = FuzzySet(-0.001, 0, 0, 0.001);
+FuzzySet Controller::S_PA = FuzzySet(0, 0.001, 0.002, 0.01);
 FuzzySet Controller::L_PA = FuzzySet(0.002, 0.01, 0.1, 0.1);
 
 FuzzyOutput Controller::adjust = FuzzyOutput(1);
-FuzzySet Controller::L_D = FuzzySet(-18, -16, -16, -14);
+FuzzySet Controller::VL_D = FuzzySet(-18, -16, -16, -14);
+FuzzySet Controller::L_D = FuzzySet(-10, -8, -8, -6);
 FuzzySet Controller::M_D = FuzzySet(-6, -4, -4, -2);
 FuzzySet Controller::S_D = FuzzySet(-4, -2, -2, 0);
 FuzzySet Controller::K = FuzzySet(-1,0,0,1);
 FuzzySet Controller::S_I = FuzzySet(0, 2, 2, 4);
 FuzzySet Controller::M_I = FuzzySet(2, 4, 4, 6);
-FuzzySet Controller::L_I = FuzzySet(14, 16, 16, 18);
+FuzzySet Controller::L_I = FuzzySet(6, 8, 8, 10);
+FuzzySet Controller::VL_I = FuzzySet(14, 16, 16, 18);
 
 Controller::Controller (float *sensor, uint8_t pinNumber) {
   int i = 1;
@@ -85,63 +87,103 @@ Controller::Controller (float *sensor, uint8_t pinNumber) {
     adjust.addFuzzySet(&L_I);
     fuzzy->addFuzzyOutput(&adjust);
 
-    FuzzyRuleAntecedent* ifLargeNegative = new FuzzyRuleAntecedent();
-    ifLargeNegative->joinSingle(&L_N);
+    FuzzyRuleAntecedent* ifLargeNegativeAndQuicklyDecreasing = new FuzzyRuleAntecedent();
+    FuzzyRuleAntecedent* ifLargeNegativeAndSlowlyDecreasing = new FuzzyRuleAntecedent();
+    FuzzyRuleAntecedent* ifLargeNegativeAndNotMoving = new FuzzyRuleAntecedent();
+    FuzzyRuleAntecedent* ifLargeNegativeAndSlowlyIncreasing = new FuzzyRuleAntecedent();
+    FuzzyRuleAntecedent* ifLargeNegativeAndQuicklyIncreasing = new FuzzyRuleAntecedent();
     FuzzyRuleAntecedent* ifSmallNegativeAndQuicklyDecreasing = new FuzzyRuleAntecedent();
-    ifSmallNegativeAndQuicklyDecreasing->joinWithAND(&S_N,&L_NA);
     FuzzyRuleAntecedent* ifSmallNegativeAndSlowlyDecreasing = new FuzzyRuleAntecedent();
-    ifSmallNegativeAndSlowlyDecreasing->joinWithAND(&S_N,&S_NA);
     FuzzyRuleAntecedent* ifSmallNegativeAndNotMoving = new FuzzyRuleAntecedent();
-    ifSmallNegativeAndNotMoving->joinWithAND(&S_N,&Z_A);
     FuzzyRuleAntecedent* ifSmallNegativeAndSlowlyIncreasing = new FuzzyRuleAntecedent();
-    ifSmallNegativeAndSlowlyIncreasing->joinWithAND(&S_N, &S_PA);
     FuzzyRuleAntecedent* ifSmallNegativeAndQuicklyIncreasing = new FuzzyRuleAntecedent();
-    ifSmallNegativeAndQuicklyIncreasing->joinWithAND(&S_N, &L_PA);
+    FuzzyRuleAntecedent* ifZeroAndQuicklyDecreasing = new FuzzyRuleAntecedent();
+    FuzzyRuleAntecedent* ifZeroAndSlowlyDecreasing = new FuzzyRuleAntecedent();
     FuzzyRuleAntecedent* ifZeroAndNotMoving = new FuzzyRuleAntecedent();
-    ifZeroAndNotMoving->joinWithAND(&Z, &Z_A);
-    FuzzyRuleAntecedent* Increasing = new FuzzyRuleAntecedent();
-    Increasing->joinWithOR(&L_PA, &S_PA);
+    FuzzyRuleAntecedent* ifZeroAndSlowlyIncreasing = new FuzzyRuleAntecedent();
+    FuzzyRuleAntecedent* ifZeroAndQuicklyIncreasing = new FuzzyRuleAntecedent();
     FuzzyRuleAntecedent* ifSmallPositiveAndSlowlyIncreasing = new FuzzyRuleAntecedent();
-    ifSmallPositiveAndSlowlyIncreasing->joinWithAND(&S_P,&S_PA);
     FuzzyRuleAntecedent* ifSmallPositiveAndQuicklyIncreasing = new FuzzyRuleAntecedent();
-    ifSmallPositiveAndQuicklyIncreasing->joinWithAND(&S_P,&L_PA);
     FuzzyRuleAntecedent* ifSmallPositiveAndNotMoving = new FuzzyRuleAntecedent();
-    ifSmallPositiveAndNotMoving->joinWithAND(&S_P,&Z_A);
     FuzzyRuleAntecedent* ifSmallPositiveAndSlowlyDecreasing = new FuzzyRuleAntecedent();
-    ifSmallPositiveAndSlowlyDecreasing->joinWithAND(&S_P, &S_NA);
     FuzzyRuleAntecedent* ifSmallPositiveAndQuicklyDecreasing = new FuzzyRuleAntecedent();
-    ifSmallPositiveAndQuicklyDecreasing->joinWithAND(&S_P, &L_NA);
-    FuzzyRuleAntecedent* ifLargePositive = new FuzzyRuleAntecedent();
-    ifLargePositive->joinSingle(&L_P);
+    FuzzyRuleAntecedent* ifLargePositiveAndQuicklyDecreasing = new FuzzyRuleAntecedent();
+    FuzzyRuleAntecedent* ifLargePositiveAndSlowlyDecreasing = new FuzzyRuleAntecedent();
+    FuzzyRuleAntecedent* ifLargePositiveAndNotMoving = new FuzzyRuleAntecedent();
+    FuzzyRuleAntecedent* ifLargePositiveAndSlowlyIncreasing = new FuzzyRuleAntecedent();
+    FuzzyRuleAntecedent* ifLargePositiveAndQuicklyIncreasing = new FuzzyRuleAntecedent();
 
+    ifLargeNegativeAndQuicklyDecreasing->joinWithAND(&L_N, &L_NA);
+    ifLargeNegativeAndSlowlyDecreasing->joinWithAND(&L_N, &S_NA);
+    ifLargeNegativeAndNotMoving->joinWithAND(&L_N, &Z_A);
+    ifLargeNegativeAndSlowlyIncreasing->joinWithAND(&L_N, &S_PA);
+    ifLargeNegativeAndQuicklyIncreasing->joinWithAND(&L_N, &L_PA);
+    ifSmallNegativeAndQuicklyDecreasing->joinWithAND(&S_N,&L_NA);
+    ifSmallNegativeAndSlowlyDecreasing->joinWithAND(&S_N,&S_NA);
+    ifSmallNegativeAndNotMoving->joinWithAND(&S_N,&Z_A);
+    ifSmallNegativeAndSlowlyIncreasing->joinWithAND(&S_N, &S_PA);
+    ifSmallNegativeAndQuicklyIncreasing->joinWithAND(&S_N, &L_PA);
+    ifZeroAndQuicklyDecreasing->joinWithAND(&Z, &L_NA);
+    ifZeroAndSlowlyDecreasing->joinWithAND(&Z, &S_NA);
+    ifZeroAndNotMoving->joinWithAND(&Z, &Z_A);
+    ifZeroAndSlowlyIncreasing->joinWithAND(&Z, &S_PA);
+    ifZeroAndQuicklyIncreasing->joinWithAND(&Z, &L_PA);
+    ifSmallPositiveAndSlowlyIncreasing->joinWithAND(&S_P,&S_PA);
+    ifSmallPositiveAndQuicklyIncreasing->joinWithAND(&S_P,&L_PA);
+    ifSmallPositiveAndNotMoving->joinWithAND(&S_P,&Z_A);
+    ifSmallPositiveAndSlowlyDecreasing->joinWithAND(&S_P, &S_NA);
+    ifSmallPositiveAndQuicklyDecreasing->joinWithAND(&S_P, &L_NA);
+    ifLargePositiveAndQuicklyDecreasing->joinWithAND(&L_P, &L_NA);
+    ifLargePositiveAndSlowlyDecreasing->joinWithAND(&L_P, &S_NA);
+    ifLargePositiveAndNotMoving->joinWithAND(&L_P, &Z_A);
+    ifLargePositiveAndSlowlyIncreasing->joinWithAND(&L_P, &S_PA);
+    ifLargePositiveAndQuicklyIncreasing->joinWithAND(&L_P, &L_PA);
+
+    FuzzyRuleConsequent* VeryLargeDecrease = new FuzzyRuleConsequent();
     FuzzyRuleConsequent* LargeDecrease = new FuzzyRuleConsequent();
-    LargeDecrease->addOutput(&L_D);
     FuzzyRuleConsequent* MediumDecrease = new FuzzyRuleConsequent();
-    MediumDecrease->addOutput(&M_D);
     FuzzyRuleConsequent* SmallDecrease = new FuzzyRuleConsequent();
-    SmallDecrease->addOutput(&S_D);
     FuzzyRuleConsequent* Keep = new FuzzyRuleConsequent();
-    Keep->addOutput(&K);
     FuzzyRuleConsequent* SmallIncrease = new FuzzyRuleConsequent();
-    SmallIncrease->addOutput(&S_I);
     FuzzyRuleConsequent* MediumIncrease = new FuzzyRuleConsequent();
-    MediumIncrease->addOutput(&M_I);
     FuzzyRuleConsequent* LargeIncrease = new FuzzyRuleConsequent();
+    FuzzyRuleConsequent* VeryLargeIncrease = new FuzzyRuleConsequent();
+
+    VeryLargeDecrease->addOutput(&VL_D);
+    LargeDecrease->addOutput(&L_D);
+    MediumDecrease->addOutput(&M_D);
+    SmallDecrease->addOutput(&S_D);
+    Keep->addOutput(&K);
+    SmallIncrease->addOutput(&S_I);
+    MediumIncrease->addOutput(&M_I);
     LargeIncrease->addOutput(&L_I);
+    VeryLargeIncrease->addOutput(&L_I);
     
-    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifLargeNegative, LargeIncrease));
-    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallNegativeAndQuicklyDecreasing, MediumIncrease));
-    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallNegativeAndSlowlyDecreasing, SmallIncrease));
+    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifLargeNegativeAndQuicklyDecreasing, VeryLargeIncrease));
+    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifLargeNegativeAndSlowlyDecreasing, LargeIncrease));
+    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifLargeNegativeAndNotMoving, MediumIncrease));
+    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifLargeNegativeAndSlowlyIncreasing, SmallIncrease));
+    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifLargeNegativeAndQuicklyIncreasing, Keep));
+    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallNegativeAndQuicklyDecreasing, LargeIncrease));
+    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallNegativeAndSlowlyDecreasing, MediumIncrease));
     fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallNegativeAndNotMoving, SmallIncrease));
     fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallNegativeAndSlowlyIncreasing, Keep));
     fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallNegativeAndQuicklyIncreasing, SmallDecrease));
+    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifZeroAndQuicklyDecreasing, MediumIncrease));
+    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifZeroAndSlowlyDecreasing, SmallIncrease));
     fuzzy->addFuzzyRule(new FuzzyRule(i++, ifZeroAndNotMoving, Keep));
+    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifZeroAndSlowlyIncreasing, SmallDecrease));
+    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifZeroAndQuicklyIncreasing, MediumDecrease));
     fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallPositiveAndQuicklyDecreasing, SmallIncrease));
     fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallPositiveAndSlowlyDecreasing, Keep));
     fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallPositiveAndNotMoving, SmallDecrease));
-    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallPositiveAndSlowlyIncreasing, SmallDecrease));
-    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallPositiveAndQuicklyIncreasing, MediumDecrease));
-    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifLargePositive, LargeDecrease));
+    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallPositiveAndSlowlyIncreasing, MediumDecrease));
+    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallPositiveAndQuicklyIncreasing, LargeDecrease));
+    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifLargePositiveAndQuicklyDecreasing, Keep));
+    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifLargePositiveAndSlowlyDecreasing, SmallDecrease));
+    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifLargePositiveAndNotMoving, MediumDecrease));
+    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifLargePositiveAndSlowlyIncreasing, LargeDecrease));
+    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifLargePositiveAndQuicklyIncreasing, VeryLargeDecrease));
   } 
 }
 
