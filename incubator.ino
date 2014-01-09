@@ -118,8 +118,6 @@ void loop (void) {
   bool encRead;
   bool problem = false;
 
-  Serial.println("Init");
-
   analogWrite(FANPIN, 255);
 
   while (true) {
