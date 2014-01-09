@@ -255,10 +255,16 @@ void Controller::control (void) {
 
   for (i=1; i<=NUM_RULES; i++) {
     Serial.print(fuzzy->isFiredRule(i));
-    Serial.print(' ');
+    if (i%5) {
+      Serial.print(' ');
+    } else {
+      Serial.println();
+    }
   }
   Serial.println();
 
+  Serial.print(VL_D.getPertinence());
+  Serial.print(' ');
   Serial.print(L_D.getPertinence());
   Serial.print(' ');
   Serial.print(M_D.getPertinence());
@@ -271,7 +277,9 @@ void Controller::control (void) {
   Serial.print(' ');
   Serial.print(M_I.getPertinence());
   Serial.print(' ');
-  Serial.println(L_I.getPertinence());
+  Serial.print(L_I.getPertinence());
+  Serial.print(' ');
+  Serial.println(VL_I.getPertinence());
 #endif
 
   throttle = fuzzy->defuzzify(1);
