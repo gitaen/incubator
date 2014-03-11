@@ -1,8 +1,8 @@
 #ifndef _TIMERTRIGGER_
 #define _TIMERTRIGGER_
 
-#define MAXSTEPS 6
-#define OFFTIME 7200
+#define MAXSTEPS 12
+#define OFFTIME 14400
 #define MAXONTIME 10
 
 class TimerTrigger {
