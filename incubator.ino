@@ -98,6 +98,8 @@ void setup (void){
   humidityScreen.init(&lcd, F("RH"), humidityController, '%');
   timerScreen.init(&lcd, F("Turner"), &eggTurnerTimer);
 
+  // temperatureController->setTarget(37.7);
+  // humidityController->setTarget(55);
   // while (!Serial.available()) {
   //   delay (1000);
   // }
