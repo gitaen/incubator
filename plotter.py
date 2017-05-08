@@ -26,10 +26,11 @@ h('set style data lines')
 start = int(time.time())
 lastTemp = 0;
 lastTime = start;
-ser.readline()
 f = open('/tmp/logs.txt', 'w')
 while 1:
-    ser.write('G')
+    while ser.inWaiting() == 0:
+        ser.write('G')
+
     line = ser.readline()
     f.write(line);
     reading = line.split()
