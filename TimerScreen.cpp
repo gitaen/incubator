@@ -22,8 +22,6 @@ void TimerScreen::refresh () {
 }
 
 void TimerScreen::modify(float step) {
-  float target;
-
   _timer->activate(!_timer->isActive());
   refresh();
 }

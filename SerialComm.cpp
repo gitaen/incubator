@@ -65,11 +65,11 @@ void SerialComm::setParameters()
   if (Serial.available()) {
     parameter = Serial.read();
     if (parameter == 'T') {
-      if (floatVal = Serial.parseFloat()) {
+      if ((floatVal = Serial.parseFloat())) {
 	_tempController->setTarget(floatVal);
       }
     } else if (parameter == 'H') {
-      if (floatVal = Serial.parseFloat()) {
+      if ((floatVal = Serial.parseFloat())) {
 	_humidController->setTarget(floatVal);
       }
     } else if (parameter == 'E') {

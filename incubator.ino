@@ -217,7 +217,7 @@ void loop (void) {
     }
 
     lastSelectRead = selectRead;
-    tick_counter = ++tick_counter % 100;
+    tick_counter = (tick_counter + 1) % 100;
     if ((millis()-now) < PERIOD) {
       delay(PERIOD-(millis()-now));
     }

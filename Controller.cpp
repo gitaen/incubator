@@ -214,7 +214,6 @@ void Controller::control (void) {
   float error;
   float delta;
   float throttle;
-  uint8_t i;
   float elapsedSeconds;
 
   error = *_sensor - target;
@@ -301,7 +300,7 @@ void Controller::control (void) {
 
 
 void Controller::save(int address) {
-  int i;
+  unsigned int i;
   byte *b = (byte *)&target;
 
   if (modified) {
@@ -314,7 +313,7 @@ void Controller::save(int address) {
 }
 
 void Controller::restore(int address) {
-  int i;
+  unsigned int i;
   byte *b = (byte *)&target;
 
   for (i=0; i<sizeof(float); i++) {
