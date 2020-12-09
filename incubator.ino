@@ -1,3 +1,4 @@
+#include <avr/wdt.h>
 #include <Sensirion.h>
 #include <LiquidCrystal.h>
 #include <MemoryFree.h>
@@ -103,6 +104,7 @@ void setup (void){
   // while (!Serial.available()) {
   //   delay (1000);
   // }
+  wdt_enable(WDTO_8S);
 }
 
 void loop (void) {
@@ -221,6 +223,8 @@ void loop (void) {
     if ((millis()-now) < PERIOD) {
       delay(PERIOD-(millis()-now));
     }
+
+    wdt_reset();
   }
 
 }
