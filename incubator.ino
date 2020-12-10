@@ -163,7 +163,7 @@ void loop (void) {
       screen[activeScreen]->refresh();
     }
 
-    if (!(tick_counter % 50)) {
+    if (!(tick_counter % 25)) {
       if (!measActive) {
 	measActive = true;
 	measType = TEMP;
