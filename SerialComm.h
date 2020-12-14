@@ -1,7 +1,6 @@
 #ifndef _SERIALCOMM_
 #define _SERIALCOMM_
 
-#include "Sensor.h"
 #include "TimerTrigger.h"
 #include "Controller.h"
 
