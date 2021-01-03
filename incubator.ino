@@ -1,7 +1,6 @@
 #include <avr/wdt.h>
 #include <Sensirion.h>
 #include <LiquidCrystal.h>
-#include <MemoryFree.h>
 #include "Controller.h"
 #include "StatusScreen.h"
 #include "ControllerScreen.h"

@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <EEPROM.h>
 #include "Controller.h"
-#include <MemoryFree.h>
 
 #define MIN_POWER 0
 #define MAX_POWER 255
