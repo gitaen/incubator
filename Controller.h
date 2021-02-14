@@ -2,6 +2,8 @@
 #define _CONTROLLER_
 
 #include <PID_v1.h>
+#include <PID_AutoTune_v0.h>
+
 
 class Controller
 {
@@ -14,9 +16,15 @@ private:
   double maxError;
   uint8_t modified;
   PID pidControl;
+  bool autoTuneEnabled;
+  PID_ATune autoTune;
+
+  void runAutoTune(void);
+  void runController(void);
 
 public:
-  Controller (float *sensor, uint8_t pinNumber);
+  Controller (float *sensor, uint8_t pinNumber, unsigned int sampleTime);
+  void enableAutoTuning(void);
   void setTarget(float targetValue);
   void setMaxError(float max);
   float getTarget(void);
@@ -26,6 +34,8 @@ public:
   void save(int address);
   void restore(int address);
   bool getStatus();
+  bool isAutoTuningEnabled(void);
+  size_t getConfigSize(void);
 };
 
 #endif

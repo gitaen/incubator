@@ -33,9 +33,7 @@
 #define REDLEDPIN 12
 #define GREENLEDPIN 13
 
-#define TEMPADDR 0
-#define HUMIDADDR 4
-#define TURNERADDR 8
+#define CONFIGADDR 0
 
 uint8_t tick_counter = 0;
 
@@ -68,8 +66,8 @@ void setup (void){
   Wire.begin();
   shtxx.init();
   shtxx.setAccuracy(SHTSensor::SHT_ACCURACY_HIGH);
-  humidityController = new Controller(&humidity, HUMIDIFIERPIN);
-  temperatureController = new Controller(&temperature, HEATERPIN);
+  humidityController = new Controller(&humidity, HUMIDIFIERPIN, CONTROLLER_PERIOD);
+  temperatureController = new Controller(&temperature, HEATERPIN, CONTROLLER_PERIOD);
 
   pinMode(SELECTBUTTON, INPUT);
   digitalWrite(SELECTBUTTON, HIGH);
@@ -87,14 +85,15 @@ void setup (void){
   pinMode(REDLEDPIN, OUTPUT);
   pinMode(GREENLEDPIN, OUTPUT);
 
-  humidityController->restore(HUMIDADDR);
-  humidityController->setMaxError(2);
-  temperatureController->restore(TEMPADDR);
+  temperatureController->restore(CONFIGADDR);
   temperatureController->setMaxError(0.2);
+  humidityController->restore(CONFIGADDR + temperatureController->getConfigSize());
+  humidityController->setMaxError(2);
 
   eggTurnerTimer.init(EGGTURNERPIN);
   serialComm.init(&eggTurnerTimer, temperatureController, humidityController);
-  eggTurnerTimer.restore(TURNERADDR);
+  eggTurnerTimer.restore(CONFIGADDR + temperatureController->getConfigSize()
+                         + humidityController->getConfigSize());
 
   lcd.begin(16,2);
   statusScreen.init(&lcd, &temperature,
@@ -175,9 +174,10 @@ void loop (void) {
     } 
 
     if (!(tick_counter % 50)){
-      temperatureController->save(TEMPADDR);
-      humidityController->save(HUMIDADDR);
-      eggTurnerTimer.save(TURNERADDR);
+      temperatureController->save(CONFIGADDR);
+      humidityController->save(CONFIGADDR + temperatureController->getConfigSize());
+      eggTurnerTimer.save(CONFIGADDR + temperatureController->getConfigSize()
+                         + humidityController->getConfigSize());
     }
     
     serialComm.check();
