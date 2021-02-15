@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <EEPROM.h>
+#include <math.h>
 #include "Controller.h"
 
 #define MIN_POWER 0
@@ -61,26 +62,23 @@ float* Controller::getSensor(void) {
 }
 
 void Controller::runAutoTune(void) {
-  if (autoTune.Runtime()) {
-    pidControl.SetTunings(autoTune.GetKp(), autoTune.GetKi(), autoTune.GetKd());
-    autoTuneEnabled = false;
-    modified = true;
-  }
-}
-
-void Controller::runController(void) {
-  sensorDouble = *_sensor;
-  pidControl.Compute();
-  analogWrite (pin, power);
 }
 
 void Controller::control (void) {
+  sensorDouble = *_sensor;
+
   if (autoTuneEnabled) {
-    runAutoTune();
+    if (autoTune.Runtime()) {
+      pidControl.SetTunings(autoTune.GetKp(), autoTune.GetKi(), autoTune.GetKd());
+      autoTuneEnabled = false;
+      modified = true;
+    }
   }
   else {
-    runController();
+    pidControl.Compute();
   }
+
+  analogWrite(pin, power);
 }
 
 
@@ -104,8 +102,13 @@ void Controller::restore(int address) {
 
   config = EEPROM.get(address, config);
 
-  target = config.target;
-  pidControl.SetTunings(config.kP, config.kI, config.kD);
+  if (!isnan(config.target)) {
+    target = config.target;
+  }
+
+  if (!isnan(config.kP) && !isnan(config.kI) && !isnan(config.kD)) {
+    pidControl.SetTunings(config.kP, config.kI, config.kD);
+  }
   
   modified = false;
 }
@@ -118,7 +121,18 @@ bool Controller::isAutoTuningEnabled(void) {
   return autoTuneEnabled;
 }
 
-size_t Controller::getConfigSize(void)
-{
+size_t Controller::getConfigSize(void) {
   return sizeof(struct config);
+}
+
+double Controller::getKp(void) {
+  return pidControl.GetKp();
+}
+
+double Controller::getKi(void) {
+  return pidControl.GetKi();
+}
+
+double Controller::getKd(void) {
+  return pidControl.GetKd();
 }

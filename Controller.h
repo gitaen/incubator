@@ -36,6 +36,9 @@ public:
   bool getStatus();
   bool isAutoTuningEnabled(void);
   size_t getConfigSize(void);
+  double getKp(void);
+  double getKi(void);
+  double getKd(void);
 };
 
 #endif

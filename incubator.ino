@@ -5,6 +5,7 @@
 #include "Controller.h"
 #include "StatusScreen.h"
 #include "ControllerScreen.h"
+#include "ControllerPIDScreen.h"
 #include "TimerScreen.h"
 #include "TimerTrigger.h"
 #include "Controller.h"
@@ -15,7 +16,7 @@
 #define TURNER_PERIOD 1000
 #define SCREEN_TIMEOUT 5000
 
-#define NUMBEROFSCREENS 4
+#define NUMBEROFSCREENS 6
 #define FANPIN 5
 #define HUMIDIFIERPIN 9
 #define HEATERPIN 10
@@ -53,9 +54,14 @@ ControllerScreen temperatureScreen;
 ControllerScreen humidityScreen;
 TimerScreen timerScreen;
 
+ControllerPidScreen tempPidScreen;
+ControllerPidScreen humidPidScreen;
+
 Screen *screen[NUMBEROFSCREENS] = {&statusScreen, 
-				   &temperatureScreen, 
+				   &temperatureScreen,
+                                   &tempPidScreen,
 				   &humidityScreen,
+                                   &humidPidScreen,
 				   &timerScreen};
 
 float temperature;
@@ -99,7 +105,9 @@ void setup (void){
   statusScreen.init(&lcd, &temperature,
    		    &humidity, &eggTurnerTimer);
   temperatureScreen.init(&lcd, F("temp"), temperatureController, 'C');
+  tempPidScreen.init(&lcd, F("Temp"), temperatureController);
   humidityScreen.init(&lcd, F("RH"), humidityController, '%');
+  humidPidScreen.init(&lcd, F("RH"), humidityController);
   timerScreen.init(&lcd, F("Turner"), &eggTurnerTimer);
 
   // temperatureController->setTarget(37.7);
