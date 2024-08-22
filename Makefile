@@ -4,6 +4,6 @@ AVRDUDE_CONF = /usr/share/arduino/hardware/tools/avrdude.conf
 BOARD_TAG    = uno
 ARDUINO_PORT = /dev/ttyACM0
 
-ARDUINO_LIBS = LiquidCrystal arduino-sht EEPROM eFLL Wire
+ARDUINO_LIBS = LiquidCrystal arduino-sht EEPROM PID_v1 Wire
 
 include $(ARDUINO_DIR)/Arduino.mk

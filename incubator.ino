@@ -11,6 +11,9 @@
 #include "SerialComm.h"
 
 #define PERIOD 200
+#define CONTROLLER_PERIOD 1000
+#define TURNER_PERIOD 1000
+#define SCREEN_TIMEOUT 5000
 
 #define NUMBEROFSCREENS 4
 #define FANPIN 5
@@ -123,7 +126,7 @@ void loop (void) {
 
   while (true) {
     now = millis();
-    if ((now - lastPush) > 10000){
+    if ((now - lastPush) > SCREEN_TIMEOUT){
       if (activeScreen != 0) {
     	activeScreen = 0;
 	screen[activeScreen]->refresh();
@@ -155,12 +158,11 @@ void loop (void) {
       eggTurnerTimer.step();
     }
 
-    if (!(tick_counter % 5)) {
+    if (!(tick_counter % (TURNER_PERIOD/PERIOD))) {
       eggTurnerTimer.check();
-      screen[activeScreen]->refresh();
     }
 
-    if (!(tick_counter % 50)) {
+    if (!(tick_counter % (CONTROLLER_PERIOD/PERIOD))) {
       if (shtxx.readSample()) {
         temperature = shtxx.getTemperature();
         humidity = shtxx.getHumidity();
