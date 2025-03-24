@@ -12,11 +12,11 @@
 Fuzzy *Controller::fuzzy = NULL;
 
 FuzzyInput Controller::errorInput = FuzzyInput(1);
-FuzzySet Controller::L_N = FuzzySet(-2, -2, -1, -0.5);
-FuzzySet Controller::S_N = FuzzySet(-1, -0.5, -0.3, 0);
-FuzzySet Controller::Z = FuzzySet(-0.3, 0, 0, 0.3);
-FuzzySet Controller::S_P = FuzzySet(0, 0.3, 0.5, 1);
-FuzzySet Controller::L_P = FuzzySet(0.5, 1, 2, 2);
+FuzzySet Controller::L_N = FuzzySet(-3, -3, -2.75, -0.5);
+FuzzySet Controller::S_N = FuzzySet(-2.75, -0.5, -0.05, 0);
+FuzzySet Controller::Z = FuzzySet(-0.05, 0, 0, 0.05);
+FuzzySet Controller::S_P = FuzzySet(0, 0.05, 0.5, 2.75);
+FuzzySet Controller::L_P = FuzzySet(0.5, 2.75, 3, 3);
 
 FuzzyInput Controller::errorDeltaInput = FuzzyInput(2);
 FuzzySet Controller::L_NA = FuzzySet(-0.05, -0.05, -0.0075, -0.0025);
@@ -26,13 +26,15 @@ FuzzySet Controller::S_PA = FuzzySet(0, 0.00125, 0.0025, 0.0075);
 FuzzySet Controller::L_PA = FuzzySet(0.0025, 0.0075, 0.05, 0.05);
 
 FuzzyOutput Controller::adjust = FuzzyOutput(1);
-FuzzySet Controller::L_D = FuzzySet(-16, -16, -16, -12);
-FuzzySet Controller::M_D = FuzzySet(-16, -12, -8, -4);
-FuzzySet Controller::S_D = FuzzySet(-8, -4, -4, 0);
-FuzzySet Controller::K = FuzzySet(-4, 0, 0, 4);
-FuzzySet Controller::S_I = FuzzySet(0, 4, 4, 8);
-FuzzySet Controller::M_I = FuzzySet(4, 8, 12, 16);
-FuzzySet Controller::L_I = FuzzySet(12, 16, 16, 16);
+FuzzySet Controller::VL_D = FuzzySet(-34, -32, -32, -30);
+FuzzySet Controller::L_D = FuzzySet(-18, -16, -16, -14);
+FuzzySet Controller::M_D = FuzzySet(-6, -4, -4, -2);
+FuzzySet Controller::S_D = FuzzySet(-4, -2, -2, 0);
+FuzzySet Controller::K = FuzzySet(-1,0,0,1);
+FuzzySet Controller::S_I = FuzzySet(0, 2, 2, 4);
+FuzzySet Controller::M_I = FuzzySet(2, 4, 4, 6);
+FuzzySet Controller::L_I = FuzzySet(14, 16, 16, 18);
+FuzzySet Controller::VL_I = FuzzySet(30, 32, 32, 34);
 
 Controller::Controller (float *sensor, uint8_t pinNumber) {
   int i = 1;
@@ -75,6 +77,7 @@ Controller::Controller (float *sensor, uint8_t pinNumber) {
     errorDeltaInput.addFuzzySet(&L_PA);
     fuzzy->addFuzzyInput(&errorDeltaInput);
 
+    adjust.addFuzzySet(&VL_D);
     adjust.addFuzzySet(&L_D);
     adjust.addFuzzySet(&M_D);
     adjust.addFuzzySet(&S_D);
@@ -82,6 +85,7 @@ Controller::Controller (float *sensor, uint8_t pinNumber) {
     adjust.addFuzzySet(&S_I);
     adjust.addFuzzySet(&M_I);
     adjust.addFuzzySet(&L_I);
+    adjust.addFuzzySet(&VL_I);
     fuzzy->addFuzzyOutput(&adjust);
 
     FuzzyRuleAntecedent* ifLargeNegative = new FuzzyRuleAntecedent();
@@ -120,6 +124,7 @@ Controller::Controller (float *sensor, uint8_t pinNumber) {
     ifSmallPositiveAndQuicklyDecreasing->joinWithAND(&S_P, &L_NA);
     ifLargePositive->joinSingle(&L_P);
 
+    FuzzyRuleConsequent* VeryLargeDecrease = new FuzzyRuleConsequent();
     FuzzyRuleConsequent* LargeDecrease = new FuzzyRuleConsequent();
     FuzzyRuleConsequent* MediumDecrease = new FuzzyRuleConsequent();
     FuzzyRuleConsequent* SmallDecrease = new FuzzyRuleConsequent();
@@ -127,7 +132,9 @@ Controller::Controller (float *sensor, uint8_t pinNumber) {
     FuzzyRuleConsequent* SmallIncrease = new FuzzyRuleConsequent();
     FuzzyRuleConsequent* MediumIncrease = new FuzzyRuleConsequent();
     FuzzyRuleConsequent* LargeIncrease = new FuzzyRuleConsequent();
+    FuzzyRuleConsequent* VeryLargeIncrease = new FuzzyRuleConsequent();
 
+    VeryLargeDecrease->addOutput(&VL_D);
     LargeDecrease->addOutput(&L_D);
     MediumDecrease->addOutput(&M_D);
     SmallDecrease->addOutput(&S_D);
@@ -135,8 +142,9 @@ Controller::Controller (float *sensor, uint8_t pinNumber) {
     SmallIncrease->addOutput(&S_I);
     MediumIncrease->addOutput(&M_I);
     LargeIncrease->addOutput(&L_I);
-
-    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifLargeNegative, LargeIncrease));
+    VeryLargeIncrease->addOutput(&VL_I);
+    
+    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifLargeNegative, VeryLargeIncrease));
     fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallNegativeAndQuicklyDecreasing, LargeIncrease));
     fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallNegativeAndSlowlyDecreasing, MediumIncrease));
     fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallNegativeAndNotMoving, SmallIncrease));
@@ -152,7 +160,7 @@ Controller::Controller (float *sensor, uint8_t pinNumber) {
     fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallPositiveAndNotMoving, SmallDecrease));
     fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallPositiveAndSlowlyIncreasing, MediumDecrease));
     fuzzy->addFuzzyRule(new FuzzyRule(i++, ifSmallPositiveAndQuicklyIncreasing, LargeDecrease));
-    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifLargePositive, LargeDecrease));
+    fuzzy->addFuzzyRule(new FuzzyRule(i++, ifLargePositive, VeryLargeDecrease));
   } 
 }
 
