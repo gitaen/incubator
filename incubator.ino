@@ -1,5 +1,6 @@
 #include <avr/wdt.h>
-#include <Sensirion.h>
+#include <Wire.h>
+#include <SHTSensor.h>
 #include <LiquidCrystal.h>
 #include "Controller.h"
 #include "StatusScreen.h"
@@ -12,8 +13,6 @@
 #define PERIOD 200
 
 #define NUMBEROFSCREENS 4
-#define SCKPIN 3
-#define DATAPIN 2
 #define FANPIN 5
 #define HUMIDIFIERPIN 9
 #define HEATERPIN 10
@@ -26,8 +25,8 @@
 #define ENABLEPIN A1
 #define D4PIN A3
 #define D5PIN A2
-#define D6PIN A5
-#define D7PIN A4
+#define D6PIN 2
+#define D7PIN 3
 #define REDLEDPIN 12
 #define GREENLEDPIN 13
 
@@ -38,7 +37,7 @@
 uint8_t tick_counter = 0;
 
 LiquidCrystal lcd = LiquidCrystal(RSPIN, ENABLEPIN, D4PIN, D5PIN, D6PIN, D7PIN); 
-Sensirion shtxx = Sensirion(DATAPIN, SCKPIN);
+SHTSensor shtxx;
 
 Controller *humidityController;
 Controller *temperatureController;
@@ -63,6 +62,9 @@ float humidity;
 
 void setup (void){
   Serial.begin(115200);
+  Wire.begin();
+  shtxx.init();
+  shtxx.setAccuracy(SHTSensor::SHT_ACCURACY_HIGH);
   humidityController = new Controller(&humidity, HUMIDIFIERPIN);
   temperatureController = new Controller(&temperature, HEATERPIN);
 
@@ -110,10 +112,6 @@ void loop (void) {
   unsigned long int lastPush = millis();
   uint8_t activeScreen = 0;
   const float step = 0.1;
-  bool measActive = false;
-  uint8_t measType = TEMP;
-  bool measReady = false;
-  unsigned int rawData;
   unsigned long int now;
   bool lastSelectRead = digitalRead(SELECTBUTTON);
   bool selectRead;
@@ -163,42 +161,17 @@ void loop (void) {
     }
 
     if (!(tick_counter % 50)) {
-      if (!measActive) {
-	measActive = true;
-	measType = TEMP;
-	shtxx.meas(measType, &rawData, NONBLOCK);
+      if (shtxx.readSample()) {
+        temperature = shtxx.getTemperature();
+        humidity = shtxx.getHumidity();
+        temperatureController->control();
+        humidityController->control();
+        screen[activeScreen]->refresh();
       } else {
 	Serial.println(88888888);
       }
     } 
 
-    if (measActive && shtxx.measRdy()) {
-      switch(shtxx.measRdy()) {
-      case S_Meas_Rdy:
-	if (measType == TEMP) {
-	  temperature = shtxx.calcTemp(rawData);
-	  measType = HUMI;
-	  shtxx.meas(measType, &rawData, NONBLOCK);
-	} else {
-	  humidity = shtxx.calcHumi(rawData, temperature);
-	  measActive = false;
-	  measReady = true;
-	}
-	break;
-      case S_Err_CRC:
-	Serial.println(99999999);
-	shtxx.meas(measType, &rawData, NONBLOCK);
-	break;
-      }
-    }
-
-    if (measReady) {
-      measReady = false;
-      temperatureController->control();
-      humidityController->control();
-      screen[activeScreen]->refresh();
-    }
-    
     if (!(tick_counter % 50)){
       temperatureController->save(TEMPADDR);
       humidityController->save(HUMIDADDR);
